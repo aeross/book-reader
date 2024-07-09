@@ -26,5 +26,18 @@ namespace BookReaderAPI.Controllers
         {
             return _entity.GetBooks();
         }
+
+        [HttpGet("{id}")]
+        public IEnumerable<Book> GetById(int id)
+        {
+            return _entity.GetBookById(id);
+        }
+
+        [HttpPost]
+        public IActionResult Insert([FromBody] Book book)
+        {
+            _entity.InsertBook(book);
+            return Created();
+        }
     }
 }
