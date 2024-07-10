@@ -1,8 +1,9 @@
-﻿using System.Data;
+﻿using BookReaderAPI.Data;
+using System.Data;
 
 namespace BookReaderAPI.Entities
 {
-    public class Book
+    public class Book : Entity, IEntity
     {
         public int Id { get; set; }
         public string? Genre { get; set; }
@@ -10,17 +11,17 @@ namespace BookReaderAPI.Entities
         public string? Tagline { get; set; }
         public string? Description { get; set; }
 
-        public static string GetQuery()
+        static string IEntity.GetQuery()
         {
             return "SELECT * FROM public.books";
         }
 
-        public static string GetByIdQuery()
+        static string IEntity.GetByIdQuery()
         {
             return "SELECT * FROM public.books WHERE id = @id";
         }
 
-        public static string InsertQuery()
+        static string IEntity.InsertQuery()
         {
             return @"
             INSERT INTO public.books(genre, title, tagline, description, cover_img_file_id, created_at, updated_at)
@@ -28,7 +29,7 @@ namespace BookReaderAPI.Entities
             ";
         }
 
-        public static string UpdateQuery()
+        static string IEntity.UpdateQuery()
         {
             return @"
             UPDATE public.books
@@ -42,21 +43,23 @@ namespace BookReaderAPI.Entities
             ";
         }
 
-        public static string DeleteQuery()
+        static string IEntity.DeleteQuery()
         {
             return "DELETE FROM public.books WHERE id = @id";
         }
 
-        public static Book Create(IDataRecord record)
+
+        static dynamic IEntity.Create(IDataRecord record)
         {
-            return new Book
+            Book b = new Book
             {
                 Id = (int)record["id"],
-                Genre = Entity.ConvertFromDBVal<string>(record["genre"]),
-                Title = Entity.ConvertFromDBVal<string>(record["title"]),
-                Tagline = Entity.ConvertFromDBVal<string>(record["tagline"]),
-                Description = Entity.ConvertFromDBVal<string>(record["description"])
+                Genre = DbContext.ConvertFromDBVal<string>(record["genre"]),
+                Title = DbContext.ConvertFromDBVal<string>(record["title"]),
+                Tagline = DbContext.ConvertFromDBVal<string>(record["tagline"]),
+                Description = DbContext.ConvertFromDBVal<string>(record["description"])
             };
+            return b;
         }
     }
 }

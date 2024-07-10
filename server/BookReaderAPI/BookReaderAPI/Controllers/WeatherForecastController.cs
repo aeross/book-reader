@@ -14,30 +14,30 @@ namespace BookReaderAPI.Controllers
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
-        private Entity _entity;
+        private DbContext _context;
 
         public WeatherForecastController(IConfiguration config)
         {
-            _entity = new Entity(config);
+            _context = new DbContext(config);
         }
 
         [HttpGet]
-        public IEnumerable<Book> Get()
+        public IEnumerable<dynamic> Get()
         {
-            return _entity.GetBooks();
+            return _context.Get<Book>();
         }
 
-        [HttpGet("{id}")]
-        public IEnumerable<Book> GetById(int id)
-        {
-            return _entity.GetBookById(id);
-        }
+        //[HttpGet("{id}")]
+        //public IEnumerable<Book> GetById(int id)
+        //{
+        //    return _context.GetBookById(id);
+        //}
 
-        [HttpPost]
-        public IActionResult Insert([FromBody] Book book)
-        {
-            _entity.InsertBook(book);
-            return Created();
-        }
+        //[HttpPost]
+        //public IActionResult Insert([FromBody] Book book)
+        //{
+        //    _context.InsertBook(book);
+        //    return Created();
+        //}
     }
 }

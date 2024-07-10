@@ -1,104 +1,37 @@
-﻿using BookReaderAPI.Data;
-using Npgsql;
-using System.Diagnostics;
+﻿using System.Data;
 
 namespace BookReaderAPI.Entities
 {
-    public class Entity
+    public abstract class Entity
     {
-        private IConfiguration _config;
-        public Entity(IConfiguration config)
+        public static string GetQuery<T>() where T : IEntity
         {
-            _config = config;
+            return T.GetQuery();
         }
 
-        private NpgsqlConnection GetConnection()
+        public static string GetByIdQuery<T>() where T : IEntity
         {
-            string? config = _config.GetConnectionString("Default");
-            if (config is not null)
-            {
-                return new NpgsqlConnection(config);
-            }
-            throw new Exception("Connection string not found");
+            return T.GetByIdQuery();
         }
 
-        public static T ConvertFromDBVal<T>(object obj)
+        public static string InsertQuery<T>() where T : IEntity
         {
-            if (obj == null || obj == DBNull.Value)
-            {
-                return default; // returns the default value for the type
-            }
-            else
-            {
-                return (T)obj;
-            }
+            return T.InsertQuery();
         }
 
-
-        public IEnumerable<Book> GetBooks()
+        public static string UpdateQuery<T>() where T : IEntity
         {
-            using (NpgsqlConnection conn = GetConnection())
-            {
-                conn.Open();
-
-                NpgsqlCommand cmd = new NpgsqlCommand(Book.GetQuery(), conn);
-
-                NpgsqlDataReader dr = cmd.ExecuteReader();
-                while (dr.Read())
-                {
-                    yield return Book.Create(dr);
-                }
-
-                conn.Close();
-            }
+            return T.UpdateQuery();
         }
 
-        public IEnumerable<Book> GetBookById(int id)
+        public static string DeleteQuery<T>() where T : IEntity
         {
-            using (NpgsqlConnection conn = GetConnection())
-            {
-                conn.Open();
-
-                NpgsqlCommand cmd = new NpgsqlCommand(Book.GetByIdQuery(), conn);
-                cmd.Parameters.AddWithValue("@id", id);
-
-                NpgsqlDataReader dr = cmd.ExecuteReader();
-                while (dr.Read())
-                {
-                    yield return Book.Create(dr);
-                }
-
-                conn.Close();
-            }
+            return T.DeleteQuery();
         }
 
-
-        public void InsertBook(Book book)
+        public static dynamic Create<T>(IDataRecord record) where T : IEntity
         {
-            using (NpgsqlConnection conn = GetConnection())
-            {
-                conn.Open();
-
-                NpgsqlCommand cmd = new NpgsqlCommand(Book.InsertQuery(), conn);
-
-                string? genre = book.Genre;
-                string title = book.Title;
-                string? tagline = book.Tagline;
-                string? description = book.Description;
-                cmd.Parameters.AddWithValue("@genre", genre == null ? DBNull.Value : genre);
-                cmd.Parameters.AddWithValue("@title", title == null ? DBNull.Value : title);
-                cmd.Parameters.AddWithValue("@tagline", tagline == null ? DBNull.Value : tagline);
-                cmd.Parameters.AddWithValue("@description", description == null ? DBNull.Value : description);
-                cmd.Parameters.AddWithValue("@cover_img_file_id", DBNull.Value);
-
-                cmd.ExecuteReader();
-                //while (dr.Read())
-                //{
-                //    yield return Book.Create(dr);
-                //}
-
-                conn.Close();
-            }
+            return T.Create(record);
         }
     }
 }
