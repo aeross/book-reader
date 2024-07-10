@@ -3,7 +3,7 @@ using System.Data;
 
 namespace BookReaderAPI.Entities
 {
-    public class Book : Entity, IEntity
+    public class Book : IEntity
     {
         public int Id { get; set; }
         public string? Genre { get; set; }

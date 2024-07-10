@@ -47,7 +47,7 @@ namespace BookReaderAPI.Data
             using (NpgsqlConnection conn = GetConnection())
             {
                 conn.Open();
-                string query = Entity.GetQuery<T>();
+                string query = T.GetQuery();
 
                 NpgsqlCommand cmd = new NpgsqlCommand(query, conn);
 
