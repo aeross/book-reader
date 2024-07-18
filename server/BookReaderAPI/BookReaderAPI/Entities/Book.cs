@@ -7,9 +7,12 @@ namespace BookReaderAPI.Entities
     {
         public int Id { get; set; }
         public string? Genre { get; set; }
-        public required string Title { get; set; }
+        public string? Title { get; set; }
         public string? Tagline { get; set; }
         public string? Description { get; set; }
+        public int? CoverImgFileId { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         static string IEntity.GetQuery()
         {
@@ -25,7 +28,7 @@ namespace BookReaderAPI.Entities
         {
             return @"
             INSERT INTO public.books(genre, title, tagline, description, cover_img_file_id, created_at, updated_at)
-            VALUES (@genre, @title, @tagline, @description, @cover_img_file_id, now(), now());
+            VALUES (@Genre, @Title, @Tagline, @Description, @CoverImgFileId, now(), now());
             ";
         }
 
@@ -33,11 +36,11 @@ namespace BookReaderAPI.Entities
         {
             return @"
             UPDATE public.books
-            SET genre = @genre,
-                title = @title,
-                tagline = @tagline,
-                description = @description,
-                cover_img_file_id = @cover_img_file_id,
+            SET genre = @Genre,
+                title = @Title,
+                tagline = @Tagline,
+                description = @Description,
+                cover_img_file_id = @CoverImgFileId,
                 updated_at = @now
             WHERE id = @id;
             ";
@@ -57,7 +60,9 @@ namespace BookReaderAPI.Entities
                 Genre = DbContext.ConvertFromDBVal<string>(record["genre"]),
                 Title = DbContext.ConvertFromDBVal<string>(record["title"]),
                 Tagline = DbContext.ConvertFromDBVal<string>(record["tagline"]),
-                Description = DbContext.ConvertFromDBVal<string>(record["description"])
+                Description = DbContext.ConvertFromDBVal<string>(record["description"]),
+                CreatedAt = DbContext.ConvertFromDBVal<DateTime>(record["created_at"]),
+                UpdatedAt = DbContext.ConvertFromDBVal<DateTime>(record["updated_at"])
             };
             return b;
         }

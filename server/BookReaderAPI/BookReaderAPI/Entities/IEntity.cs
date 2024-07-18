@@ -5,6 +5,11 @@ using System.Diagnostics;
 
 namespace BookReaderAPI.Entities
 {
+    /**
+     * Each entity should implement this interface.
+     * Contains five basic CRUD methods as well as a method to convert the queried entity
+     * into the class-defined entity in this application.
+     */
     public interface IEntity
     {
         static abstract string GetQuery();

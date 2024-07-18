@@ -27,6 +27,19 @@ namespace BookReaderAPI.Controllers
             return _context.Get<Book>();
         }
 
+        [HttpGet("{id}")]
+        public IEnumerable<dynamic> GetById(int id)
+        {
+            return _context.GetById<Book>(id);
+        }
+
+        [HttpPost]
+        public IEnumerable<dynamic> Insert([FromBody] Book book)
+        {
+            return _context.Insert(book);
+            //return _context.Get<Book>();
+        }
+
         //[HttpGet("{id}")]
         //public IEnumerable<Book> GetById(int id)
         //{
