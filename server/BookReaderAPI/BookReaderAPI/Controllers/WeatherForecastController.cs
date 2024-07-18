@@ -37,7 +37,12 @@ namespace BookReaderAPI.Controllers
         public IEnumerable<dynamic> Insert([FromBody] Book book)
         {
             return _context.Insert(book);
-            //return _context.Get<Book>();
+        }
+
+        [HttpPut("{id}")]
+        public IEnumerable<dynamic> Update(int id, [FromBody] Book book)
+        {
+            return _context.Update(id, book);
         }
 
         //[HttpGet("{id}")]

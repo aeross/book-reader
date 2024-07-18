@@ -126,24 +126,41 @@ namespace BookReaderAPI.Data
             }
         }
 
-        //public IEnumerable<Book> GetBookById(int id)
-        //{
-        //    using (NpgsqlConnection conn = GetConnection())
-        //    {
-        //        conn.Open();
+        public IEnumerable<dynamic> Update<T>(int id, T data) where T : IEntity
+        {
+            using (NpgsqlConnection conn = GetConnection())
+            {
+                conn.Open();
+                string query = T.UpdateQuery();
 
-        //        NpgsqlCommand cmd = new NpgsqlCommand(Book.GetByIdQuery(), conn);
-        //        cmd.Parameters.AddWithValue("@id", id);
+                NpgsqlCommand cmd = new NpgsqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@id", id);
 
-        //        NpgsqlDataReader dr = cmd.ExecuteReader();
-        //        while (dr.Read())
-        //        {
-        //            yield return Book.Create(dr);
-        //        }
+                foreach (var prop in typeof(T).GetProperties())
+                {
+                    if (prop.Name == "Id" || prop.Name == "CreatedAt" || prop.Name == "UpdatedAt")
+                        continue;
 
-        //        conn.Close();
-        //    }
-        //}
+                    var value = prop.GetValue(data);
+                    if (value != null)
+                    {
+                        cmd.Parameters.AddWithValue("@" + prop.Name, value);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@" + prop.Name, DBNull.Value);
+                    }
+                }
+
+                NpgsqlDataReader dr = cmd.ExecuteReader();
+                while (dr.Read())
+                {
+                    yield return T.Create(dr);
+                }
+
+                conn.Close();
+            }
+        }
 
 
         //public void InsertBook(Book book)
