@@ -50,7 +50,7 @@ namespace BookReaderAPI.Entities
 
         static string IEntity.DeleteQuery()
         {
-            return "DELETE FROM public.books WHERE id = @id";
+            return "DELETE FROM public.books WHERE id = @id RETURNING *";
         }
 
 
