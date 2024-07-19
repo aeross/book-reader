@@ -7,16 +7,11 @@ namespace BookReaderAPI.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class WeatherForecastController : ControllerBase
+    public class ChapterController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
-
         private DbContext _context;
 
-        public WeatherForecastController(IConfiguration config)
+        public ChapterController(IConfiguration config)
         {
             _context = new DbContext(config);
         }
