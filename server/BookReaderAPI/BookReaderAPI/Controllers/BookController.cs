@@ -1,7 +1,6 @@
 using BookReaderAPI.Data;
 using BookReaderAPI.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Npgsql;
 
 namespace BookReaderAPI.Controllers
 {

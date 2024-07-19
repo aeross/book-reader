@@ -1,7 +1,6 @@
 using BookReaderAPI.Data;
 using BookReaderAPI.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Npgsql;
 
 namespace BookReaderAPI.Controllers
 {
@@ -19,31 +18,31 @@ namespace BookReaderAPI.Controllers
         [HttpGet]
         public IEnumerable<dynamic> Get()
         {
-            return _context.Get<Book>();
+            return _context.Get<Chapter>();
         }
 
         [HttpGet("{id}")]
         public IEnumerable<dynamic> GetById(int id)
         {
-            return _context.GetById<Book>(id);
+            return _context.GetById<Chapter>(id);
         }
 
         [HttpPost]
-        public IEnumerable<dynamic> Insert([FromBody] Book book)
+        public IEnumerable<dynamic> Insert([FromBody] Chapter c)
         {
-            return _context.Insert<Book>(book);
+            return _context.Insert<Chapter>(c);
         }
 
         [HttpPut("{id}")]
-        public IEnumerable<dynamic> Update(int id, [FromBody] Book book)
+        public IEnumerable<dynamic> Update(int id, [FromBody] Chapter c)
         {
-            return _context.Update<Book>(id, book);
+            return _context.Update<Chapter>(id, c);
         }
 
         [HttpDelete("{id}")]
         public IEnumerable<dynamic> Delete(int id)
         {
-            return _context.Delete<Book>(id);
+            return _context.Delete<Chapter>(id);
         }
     }
 }
