@@ -77,6 +77,8 @@ namespace BookReaderAPI.Entities
 
         static dynamic IEntity.Create(IDataRecord record)
         {
+            var test = record["num_of_words"];
+
             return new Chapter
             {
                 Id = (int)record["id"],
@@ -87,6 +89,21 @@ namespace BookReaderAPI.Entities
                 BookId = (int)record["book_id"],
                 CreatedAt = DbContext.ConvertFromDBVal<DateTime>(record["created_at"]),
                 UpdatedAt = DbContext.ConvertFromDBVal<DateTime>(record["updated_at"])
+            };
+        }
+
+        public static Chapter Validate(Chapter c)
+        {
+            return new Chapter
+            {
+                Id = c.Id,
+                Title = c.Title,
+                Content = c.Content,
+                NumOfWords = c.NumOfWords,
+                Status = c.Status,
+                BookId = c.BookId,
+                CreatedAt = c.CreatedAt,
+                UpdatedAt = c.UpdatedAt
             };
         }
     }

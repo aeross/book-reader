@@ -30,12 +30,14 @@ namespace BookReaderAPI.Controllers
         [HttpPost]
         public IEnumerable<dynamic> Insert([FromBody] Chapter c)
         {
+            c = Chapter.Validate(c);
             return _context.Insert<Chapter>(c);
         }
 
         [HttpPut("{id}")]
         public IEnumerable<dynamic> Update(int id, [FromBody] Chapter c)
         {
+            c = Chapter.Validate(c);
             return _context.Update<Chapter>(id, c);
         }
 

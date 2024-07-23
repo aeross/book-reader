@@ -1,13 +1,5 @@
 ﻿using BookReaderAPI.Entities;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Configuration;
 using Npgsql;
-using System;
-using System.Dynamic;
-using System.Numerics;
-using System.Reflection.Metadata;
-using System.Runtime.Intrinsics.X86;
-using System.Threading.Tasks;
 
 namespace BookReaderAPI.Data
 {
