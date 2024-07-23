@@ -32,6 +32,27 @@ namespace BookReaderAPI.Entities
         private string? _status;
 
         public int BookId { get; set; }
+        public int Ordering { get; set; }
+
+        public string? Type
+        {
+            get => _type;
+            set
+            {
+                if (string.IsNullOrEmpty(value)) 
+                {
+                    _type = "Text";
+                } else if (!(value.Equals("Text") || value.Equals("Markdown")))
+                {
+                    throw new ArgumentException("'status' must be either 'Text' or 'Markdown'");
+                } else
+                {
+                    _type = value;
+                }
+            }
+        }
+        private string? _type;
+
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 
@@ -48,8 +69,10 @@ namespace BookReaderAPI.Entities
         static string IEntity.InsertQuery()
         {
             return @"
-            INSERT INTO public.chapters(title, content, num_of_words, status, book_id, created_at, updated_at)
-            VALUES (@Title, @Content, @NumOfWords, @Status, @BookId, now(), now())
+            INSERT INTO public.chapters(title, content, num_of_words, status,
+                book_id, ordering, type, created_at, updated_at)
+            VALUES (@Title, @Content, @NumOfWords, @Status, 
+                @BookId, @Ordering, @Type, now(), now())
             RETURNING *;
             ";
         }
@@ -63,6 +86,8 @@ namespace BookReaderAPI.Entities
                 num_of_words = @NumOfWords,
                 status = @Status,
                 book_id = @BookId,
+                ordering = @Ordering,
+                type = @Type,
                 updated_at = now()
             WHERE id = @id
             RETURNING *;
@@ -87,6 +112,8 @@ namespace BookReaderAPI.Entities
                 NumOfWords = DbContext.ConvertFromDBVal<int>(record["num_of_words"]),
                 Status = DbContext.ConvertFromDBVal<string>(record["status"]),
                 BookId = (int)record["book_id"],
+                Ordering = (int)record["ordering"],
+                Type = DbContext.ConvertFromDBVal<string>(record["type"]),
                 CreatedAt = DbContext.ConvertFromDBVal<DateTime>(record["created_at"]),
                 UpdatedAt = DbContext.ConvertFromDBVal<DateTime>(record["updated_at"])
             };
@@ -102,6 +129,8 @@ namespace BookReaderAPI.Entities
                 NumOfWords = c.NumOfWords,
                 Status = c.Status,
                 BookId = c.BookId,
+                Ordering = c.Ordering,
+                Type = c.Type,
                 CreatedAt = c.CreatedAt,
                 UpdatedAt = c.UpdatedAt
             };
