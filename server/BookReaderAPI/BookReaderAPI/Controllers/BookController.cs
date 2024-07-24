@@ -6,14 +6,10 @@ namespace BookReaderAPI.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class BookController : ControllerBase
+    public class BookController : APIController
     {
-        private DbContext _context;
 
-        public BookController(IConfiguration config)
-        {
-            _context = new DbContext(config);
-        }
+        public BookController(IConfiguration config) : base(config) { }
 
         [HttpGet]
         public IEnumerable<dynamic> Get()

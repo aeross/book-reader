@@ -6,45 +6,61 @@ namespace BookReaderAPI.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ChapterController : ControllerBase
+    public class ChapterController : APIController
     {
-        private DbContext _context;
 
-        public ChapterController(IConfiguration config)
-        {
-            _context = new DbContext(config);
-        }
+        public ChapterController(IConfiguration config) : base(config) { }
 
         [HttpGet]
-        public IEnumerable<dynamic> Get()
+        public IActionResult Get()
         {
-            return _context.Get<Chapter>();
+            var result = _context.Get<Chapter>();
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
-        public IEnumerable<dynamic> GetById(int id)
+        public IActionResult GetById(int id)
         {
-            return _context.GetById<Chapter>(id);
+            var result = _context.GetById<Chapter>(id);
+            return Ok(result);
         }
 
         [HttpPost]
-        public IEnumerable<dynamic> Insert([FromBody] Chapter c)
+        public IActionResult Insert([FromBody] Chapter c)
         {
-            c = Chapter.Validate(c);
-            return _context.Insert<Chapter>(c);
+            try
+            {
+                c = Chapter.Validate(c);
+                var result = _context.Insert<Chapter>(c);
+                return Created(string.Empty, result);
+
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
         }
 
         [HttpPut("{id}")]
-        public IEnumerable<dynamic> Update(int id, [FromBody] Chapter c)
+        public IActionResult Update(int id, [FromBody] Chapter c)
         {
-            c = Chapter.Validate(c);
-            return _context.Update<Chapter>(id, c);
+            try
+            {
+                c = Chapter.Validate(c);
+                var result = _context.Update<Chapter>(id, c);
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
         }
 
         [HttpDelete("{id}")]
-        public IEnumerable<dynamic> Delete(int id)
+        public IActionResult Delete(int id)
         {
-            return _context.Delete<Chapter>(id);
+            var result = _context.Delete<Chapter>(id);
+            return Ok(result);
         }
     }
 }

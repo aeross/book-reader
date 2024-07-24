@@ -1,4 +1,5 @@
 ﻿using BookReaderAPI.Data;
+using BookReaderAPI.Exceptions;
 using BookReaderAPI.Extensions;
 using System.Data;
 
@@ -21,12 +22,19 @@ namespace BookReaderAPI.Entities
             get => _status;
             set
             {
-                if (string.IsNullOrEmpty(value) || 
-                    !(value.Equals("Draft") || value.Equals("Published")))
+                try
                 {
-                     throw new ArgumentException("'status' must be either 'Draft' or 'Published'");
+                    if (string.IsNullOrEmpty(value) || 
+                        !(value.Equals("Draft") || value.Equals("Published")))
+                    {
+                         throw new BadRequestException("'status' must be either 'Draft' or 'Published'");
+                    }
+                    _status = value;
                 }
-                _status = value;
+                catch (Exception)
+                {
+                    throw;
+                }
             }
         }
         private string? _status;
@@ -39,15 +47,22 @@ namespace BookReaderAPI.Entities
             get => _type;
             set
             {
-                if (string.IsNullOrEmpty(value)) 
+                try
                 {
-                    _type = "Text";
-                } else if (!(value.Equals("Text") || value.Equals("Markdown")))
+                    if (string.IsNullOrEmpty(value)) 
+                    {
+                        _type = "Text";
+                    } else if (!(value.Equals("Text") || value.Equals("Markdown")))
+                    {
+                        throw new ArgumentException("'status' must be either 'Text' or 'Markdown'");
+                    } else
+                    {
+                        _type = value;
+                    }
+                }
+                catch (Exception)
                 {
-                    throw new ArgumentException("'status' must be either 'Text' or 'Markdown'");
-                } else
-                {
-                    _type = value;
+                    throw;
                 }
             }
         }
@@ -121,19 +136,26 @@ namespace BookReaderAPI.Entities
 
         public static Chapter Validate(Chapter c)
         {
-            return new Chapter
+            try
             {
-                Id = c.Id,
-                Title = c.Title,
-                Content = c.Content,
-                NumOfWords = c.NumOfWords,
-                Status = c.Status,
-                BookId = c.BookId,
-                Ordering = c.Ordering,
-                Type = c.Type,
-                CreatedAt = c.CreatedAt,
-                UpdatedAt = c.UpdatedAt
-            };
+                return new Chapter
+                {
+                    Id = c.Id,
+                    Title = c.Title,
+                    Content = c.Content,
+                    NumOfWords = c.NumOfWords,
+                    Status = c.Status,
+                    BookId = c.BookId,
+                    Ordering = c.Ordering,
+                    Type = c.Type,
+                    CreatedAt = c.CreatedAt,
+                    UpdatedAt = c.UpdatedAt
+                };
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }
