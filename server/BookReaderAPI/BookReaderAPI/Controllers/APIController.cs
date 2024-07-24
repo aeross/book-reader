@@ -18,13 +18,15 @@ namespace BookReaderAPI.Controllers
         [NonAction]
         protected IActionResult HandleException(Exception e)
         {
+            Console.WriteLine(e);
+
             var errorType = e.GetType();
             if (errorType.Equals(typeof(BadRequestException)))
             {
                 return BadRequest(e.Message);
             }
 
-            return StatusCode(500, e);
+            return StatusCode(500, e.Message);
         }
     }
 }

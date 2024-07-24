@@ -10,64 +10,11 @@ namespace BookReaderAPI.Entities
         public int Id { get; set; }
         public string? Title { get; set; }
         public string? Content { get; set; }
-
-        public int? NumOfWords 
-        { 
-            get => _numOfWords;
-            set => _numOfWords = (string.IsNullOrWhiteSpace(Content)) ? 0 : Content.GetWordCount();
-        }
-        private int? _numOfWords;
-
-        public string? Status { 
-            get => _status;
-            set
-            {
-                try
-                {
-                    if (string.IsNullOrEmpty(value) || 
-                        !(value.Equals("Draft") || value.Equals("Published")))
-                    {
-                         throw new BadRequestException("'status' must be either 'Draft' or 'Published'");
-                    }
-                    _status = value;
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
-        }
-        private string? _status;
-
+        public int? NumOfWords { get; set; }
+        public string? Status { get; set; }
         public int BookId { get; set; }
         public int Ordering { get; set; }
-
-        public string? Type
-        {
-            get => _type;
-            set
-            {
-                try
-                {
-                    if (string.IsNullOrEmpty(value)) 
-                    {
-                        _type = "Text";
-                    } else if (!(value.Equals("Text") || value.Equals("Markdown")))
-                    {
-                        throw new ArgumentException("'status' must be either 'Text' or 'Markdown'");
-                    } else
-                    {
-                        _type = value;
-                    }
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
-        }
-        private string? _type;
-
+        public string? Type {  get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 
@@ -138,19 +85,26 @@ namespace BookReaderAPI.Entities
         {
             try
             {
-                return new Chapter
+                c.NumOfWords = (string.IsNullOrWhiteSpace(c.Content)) ? 0 : c.Content.GetWordCount();
+                
+                if (string.IsNullOrEmpty(c.Status) ||
+                        !(c.Status.Equals("Draft") || c.Status.Equals("Published")))
                 {
-                    Id = c.Id,
-                    Title = c.Title,
-                    Content = c.Content,
-                    NumOfWords = c.NumOfWords,
-                    Status = c.Status,
-                    BookId = c.BookId,
-                    Ordering = c.Ordering,
-                    Type = c.Type,
-                    CreatedAt = c.CreatedAt,
-                    UpdatedAt = c.UpdatedAt
-                };
+                    throw new BadRequestException("'status' must be either 'Draft' or 'Published'");
+                }
+
+                if (string.IsNullOrEmpty(c.Type))
+                {
+                    c.Type = "Text";
+                }
+                else if (!(c.Type.Equals("Text") || c.Type.Equals("Markdown")))
+                {
+                    throw new BadRequestException("'status' must be either 'Text' or 'Markdown'");
+                }
+
+                throw new IndexOutOfRangeException();
+
+                return c;
             }
             catch (Exception)
             {

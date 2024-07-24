@@ -33,7 +33,6 @@ namespace BookReaderAPI.Controllers
                 c = Chapter.Validate(c);
                 var result = _context.Insert<Chapter>(c);
                 return Created(string.Empty, result);
-
             }
             catch (Exception e)
             {
