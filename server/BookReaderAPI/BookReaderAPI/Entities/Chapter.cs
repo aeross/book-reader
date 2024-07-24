@@ -81,6 +81,10 @@ namespace BookReaderAPI.Entities
             };
         }
 
+        /**
+         * instead of editing the setters in this class's properties,
+         * we do it here so we can easily catch & throw the exceptions
+         */
         public static Chapter Validate(Chapter c)
         {
             try
@@ -101,8 +105,6 @@ namespace BookReaderAPI.Entities
                 {
                     throw new BadRequestException("'status' must be either 'Text' or 'Markdown'");
                 }
-
-                throw new IndexOutOfRangeException();
 
                 return c;
             }

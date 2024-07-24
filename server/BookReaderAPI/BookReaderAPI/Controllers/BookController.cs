@@ -4,41 +4,43 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BookReaderAPI.Controllers
 {
-    [ApiController]
-    [Route("[controller]")]
     public class BookController : APIController
     {
-
         public BookController(IConfiguration config) : base(config) { }
 
         [HttpGet]
-        public IEnumerable<dynamic> Get()
+        public IActionResult Get()
         {
-            return _context.Get<Book>();
+            var result = _context.Get<Book>();
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
-        public IEnumerable<dynamic> GetById(int id)
+        public IActionResult GetById(int id)
         {
-            return _context.GetById<Book>(id);
+            var result = _context.GetById<Book>(id);
+            return Ok(result);
         }
 
         [HttpPost]
-        public IEnumerable<dynamic> Insert([FromBody] Book book)
+        public IActionResult Insert([FromBody] Book book)
         {
-            return _context.Insert<Book>(book);
+            var result = _context.Insert<Book>(book);
+            return Created(string.Empty, result);
         }
 
         [HttpPut("{id}")]
-        public IEnumerable<dynamic> Update(int id, [FromBody] Book book)
+        public IActionResult Update(int id, [FromBody] Book book)
         {
-            return _context.Update<Book>(id, book);
+            var result = _context.Update<Book>(id, book);
+            return Ok(result);
         }
 
         [HttpDelete("{id}")]
-        public IEnumerable<dynamic> Delete(int id)
+        public IActionResult Delete(int id)
         {
-            return _context.Delete<Book>(id);
+            var result = _context.Delete<Book>(id);
+            return Ok(result);
         }
     }
 }

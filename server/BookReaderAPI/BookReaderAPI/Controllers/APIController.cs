@@ -23,10 +23,33 @@ namespace BookReaderAPI.Controllers
             var errorType = e.GetType();
             if (errorType.Equals(typeof(BadRequestException)))
             {
-                return BadRequest(e.Message);
+                return BadRequest(GetAPIResult(400, e.Message));
+            }
+            else if (errorType.Equals(typeof(NotFoundException)))
+            {
+                return NotFound(GetAPIResult(404, e.Message));
             }
 
-            return StatusCode(500, e.Message);
+            return StatusCode(500, GetAPIResult(500, e.Message));
+        }
+
+        [NonAction]
+        protected APIResult GetAPIResult(int code, dynamic? data = null)
+        {
+            string message = code switch
+            {
+                200 => "Success",
+                201 => "Created",
+                204 => "No Content",
+                400 => "Bad Request",
+                401 => "Unauthorized",
+                403 => "Forbidden",
+                404 => "Not Found",
+                405 => "Method Not Allowed",
+                500 => "Internal Server Error",
+                _ => throw new ArgumentException("Invalid status code"),
+            };
+            return new APIResult(code, message, data);
         }
     }
 }
