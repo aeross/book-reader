@@ -35,11 +35,11 @@ namespace BookReaderAPI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Insert([FromBody] Book b)
+        public IActionResult Insert([FromBody] Book body)
         {
             try
             {
-                var data = _context.Insert<Book>(b);
+                var data = _context.Insert<Book>(body);
 
                 var result = GetAPIResult(201, data);
                 return Created(string.Empty, result);
@@ -51,11 +51,11 @@ namespace BookReaderAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] Book b)
+        public IActionResult Update(int id, [FromBody] Book body)
         {
             try
             {
-                var data = _context.Update<Book>(id, b);
+                var data = _context.Update<Book>(id, body);
 
                 var result = GetAPIResult(200, data);
                 return Ok(result);

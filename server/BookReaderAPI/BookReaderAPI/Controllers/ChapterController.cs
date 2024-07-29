@@ -36,12 +36,13 @@ namespace BookReaderAPI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Insert([FromBody] Chapter c)
+        public IActionResult Insert([FromBody] Chapter body)
         {
             try
             {
-                c = Chapter.Validate(c);
-                var data = _context.Insert<Chapter>(c);
+                if (body == null) throw new BadRequestException("Request body is required");
+                body = Chapter.Validate(body);
+                var data = _context.Insert<Chapter>(body);
 
                 var result = GetAPIResult(201, data);
                 return Created(string.Empty, result);
@@ -53,12 +54,13 @@ namespace BookReaderAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] Chapter c)
+        public IActionResult Update(int id, [FromBody] Chapter body)
         {
             try
             {
-                c = Chapter.Validate(c);
-                var data = _context.Update<Chapter>(id, c);
+                if (body == null) throw new BadRequestException("Request body is required");
+                body = Chapter.Validate(body);
+                var data = _context.Update<Chapter>(id, body);
 
                 var result = GetAPIResult(200, data);
                 return Ok(result);

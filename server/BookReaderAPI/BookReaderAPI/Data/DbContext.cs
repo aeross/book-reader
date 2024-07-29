@@ -1,5 +1,6 @@
 ﻿using BookReaderAPI.Entities;
 using Npgsql;
+using System.Dynamic;
 
 namespace BookReaderAPI.Data
 {
@@ -171,6 +172,61 @@ namespace BookReaderAPI.Data
                 }
 
                 conn.Close();
+            }
+        }
+
+        // execute custom SQL query with or without params.
+        public IEnumerable<dynamic> ExecQuery(string query, params DbParams[] listParams)
+        {
+            using (NpgsqlConnection conn = GetConnection())
+            {
+                conn.Open();
+                NpgsqlCommand cmd = new NpgsqlCommand(query, conn);
+
+                if (listParams != null && listParams.Count() > 0)
+                {
+                    foreach (var item in listParams)
+                    {
+                        var type = item.Type;
+                        if (type == "string" || type == "str")
+                        {
+                            cmd.Parameters.AddWithValue(item.Name, Convert.ToString(item.Value));
+                        }
+                        else if (type == "integer" || type == "int")
+                        {
+                            cmd.Parameters.AddWithValue(item.Name, Convert.ToInt32(item.Value));
+                        }
+                        else if (type == "decimal")
+                        {
+                            cmd.Parameters.AddWithValue(item.Name, Convert.ToDecimal(item.Value));
+                        }
+                        else if (type == "boolean" || type == "bool")
+                        {
+                            cmd.Parameters.AddWithValue(item.Name, Convert.ToBoolean(item.Value));
+                        }
+                        else
+                        {
+                            cmd.Parameters.AddWithValue(item.Name, item.Value);
+                        }
+                    }
+                }
+
+                NpgsqlDataReader dr = cmd.ExecuteReader();
+
+                // read the executed result into a list
+                var output = new List<dynamic>();
+                while (dr.Read())
+                {
+                    var dataRow = new ExpandoObject() as IDictionary<string, object>;
+                    for (int i = 0; i < dr.FieldCount; i++)
+                    {
+                        dataRow.Add(dr.GetName(i), dr.IsDBNull(i) ? null : dr.GetValue(i));
+                    }
+                    output.Add(dataRow);
+                }
+
+                conn.Close();
+                return output;
             }
         }
     }

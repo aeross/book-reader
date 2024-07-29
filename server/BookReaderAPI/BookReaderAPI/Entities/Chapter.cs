@@ -85,28 +85,28 @@ namespace BookReaderAPI.Entities
          * instead of editing the setters in this class's properties,
          * we do it here so we can easily catch & throw the exceptions
          */
-        public static Chapter Validate(Chapter c)
+        public static Chapter Validate(Chapter ch)
         {
             try
             {
-                c.NumOfWords = (string.IsNullOrWhiteSpace(c.Content)) ? 0 : c.Content.GetWordCount();
+                ch.NumOfWords = (string.IsNullOrWhiteSpace(ch.Content)) ? 0 : ch.Content.GetWordCount();
                 
-                if (string.IsNullOrEmpty(c.Status) ||
-                        !(c.Status.Equals("Draft") || c.Status.Equals("Published")))
+                if (string.IsNullOrEmpty(ch.Status) ||
+                        !(ch.Status.Equals("Draft") || ch.Status.Equals("Published")))
                 {
                     throw new BadRequestException("'status' must be either 'Draft' or 'Published'");
                 }
 
-                if (string.IsNullOrEmpty(c.Type))
+                if (string.IsNullOrEmpty(ch.Type))
                 {
-                    c.Type = "Text";
+                    ch.Type = "Text";
                 }
-                else if (!(c.Type.Equals("Text") || c.Type.Equals("Markdown")))
+                else if (!(ch.Type.Equals("Text") || ch.Type.Equals("Markdown")))
                 {
-                    throw new BadRequestException("'status' must be either 'Text' or 'Markdown'");
+                    throw new BadRequestException("'type' must be either 'Text' or 'Markdown'");
                 }
 
-                return c;
+                return ch;
             }
             catch (Exception)
             {
