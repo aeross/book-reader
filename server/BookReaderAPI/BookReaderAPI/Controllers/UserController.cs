@@ -13,6 +13,7 @@ namespace BookReaderAPI.Controllers
 {
     public class UserController : APIController
     {
+        private PasswordHasher<User> _pwHasher = new();
         private IConfiguration _config;
 
         public UserController(IConfiguration config) : base(config) 
@@ -88,8 +89,7 @@ namespace BookReaderAPI.Controllers
                 body = Entities.User.Validate(body);
 
                 // hash password
-                var pwHasher = new PasswordHasher<User>();
-                body.Password = pwHasher.HashPassword(body, body.Password!);
+                body.Password = _pwHasher.HashPassword(body, body.Password!);
 
                 var data = _context.Insert<User>(body);
 
@@ -146,7 +146,8 @@ namespace BookReaderAPI.Controllers
 
                 // check password
                 var userObj = userData.First();
-                if (!password.Equals(userObj.password))
+                var verifResult = _pwHasher.VerifyHashedPassword(userBody, userObj.password, password);
+                if (verifResult == PasswordVerificationResult.Failed)
                 {
                     throw new BadRequestException("Incorrect username or password");
                 }
