@@ -62,6 +62,13 @@ namespace BookReaderAPI.Entities
         }
 
 
+        // non-standard crud queries
+        public static string GetByBookQuery()
+        {
+            return "SELECT * FROM public.chapters WHERE book_id = @BookId AND ordering = @Ordering";
+        }
+
+
         static dynamic IEntity.Create(IDataRecord record)
         {
             var test = record["num_of_words"];

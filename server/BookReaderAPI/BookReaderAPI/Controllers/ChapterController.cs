@@ -40,8 +40,18 @@ namespace BookReaderAPI.Controllers
         {
             try
             {
-                if (body == null) throw new BadRequestException("Request body is required");
                 body = Chapter.Validate(body);
+
+                // enforce unique constraint
+                string query = Chapter.GetByBookQuery();
+                var chapter = _context.ExecQuery(
+                    query,
+                    new DbParams { Name = "BookId", Value = body.BookId.ToString(), Type = "int" },
+                    new DbParams { Name = "Ordering", Value = body.Ordering.ToString(), Type = "int" }
+                );
+
+                if (chapter.Count() > 0) throw new BadRequestException("Duplicate value for (BookId, Ordering) is not allowed");
+
                 var data = _context.Insert<Chapter>(body);
 
                 var result = GetAPIResult(201, data);
@@ -58,7 +68,6 @@ namespace BookReaderAPI.Controllers
         {
             try
             {
-                if (body == null) throw new BadRequestException("Request body is required");
                 body = Chapter.Validate(body);
                 var data = _context.Update<Chapter>(id, body);
 

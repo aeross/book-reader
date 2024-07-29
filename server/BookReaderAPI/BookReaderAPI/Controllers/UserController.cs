@@ -2,6 +2,7 @@ using BookReaderAPI.Data;
 using BookReaderAPI.DTOs;
 using BookReaderAPI.Entities;
 using BookReaderAPI.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -21,24 +22,16 @@ namespace BookReaderAPI.Controllers
             _config = config;
         }
 
+        // get current user
         [HttpGet]
-        public IActionResult Get()
-        {
-            var data = _context.Get<User>();
-            var result = GetAPIResult(200, data);
-            return Ok(result);
-        }
-
-        [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public IActionResult GetCurrUser()
         {
             try
             {
-                var data = _context.GetById<User>(id);
-                if (data.Count() == 0) throw new NotFoundException("Data not found");
+                bool isAuthd = User.Identity!.IsAuthenticated;
+                if (!isAuthd) return Unauthorized(GetAPIResult(401, "Invalid token"));
 
-                var result = GetAPIResult(200, data);
-                return Ok(result);
+                return this.GetByUsername(User.Identity.Name!);
             }
             catch (Exception e)
             {
@@ -46,38 +39,40 @@ namespace BookReaderAPI.Controllers
             }
         }
 
-        //[HttpPut("{id}")]
-        //public IActionResult Update(int id, [FromBody] User body)
-        //{
-        //    try
-        //    {
-        //        var data = _context.Update<User>(id, body);
+        // get user by username
+        [HttpGet("{username}")]
+        public IActionResult GetByUsername(string username)
+        {
+            try
+            {
+                var user = _context.ExecQuery(
+                    Entities.User.GetByUsernameQuery(),
+                    new DbParams { Name = "Username", Value = username, Type = "str" }
+                );
+                if (user == null || user.Count() == 0) throw new NotFoundException("Data not found");
 
-        //        var result = GetAPIResult(200, data);
-        //        return Ok(result);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return HandleException(e);
-        //    }
-        //}
+                var userData = user.First();
 
-        //[HttpDelete("{id}")]
-        //public IActionResult Delete(int id)
-        //{
-        //    try
-        //    {
-        //        var data = _context.Delete<Book>(id);
-        //        if (data.Count() == 0) throw new NotFoundException("Data not found");
+                // remove password from the response body -- we want to keep it secret
+                var userDTO = new UserDTO
+                {
+                    Id = userData.id,
+                    Username = userData.username,
+                    FirstName = userData.first_name,
+                    LastName = userData.last_name,
+                    ProfilePicFileId = userData.profile_pic_file_id,
+                    CreatedAt = userData.created_at,
+                    UpdatedAt = userData.updated_at
+                };
 
-        //        var result = GetAPIResult(200, data);
-        //        return Ok(result);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return HandleException(e);
-        //    }
-        //}
+                var result = GetAPIResult(200, userDTO);
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
 
 
         [HttpPost("register")]
@@ -87,6 +82,12 @@ namespace BookReaderAPI.Controllers
             {
                 // validate input
                 body = Entities.User.Validate(body);
+                var userData = _context.ExecQuery(
+                    Entities.User.GetByUsernameQuery(),
+                    new DbParams { Name = "Username", Value = body.Username!, Type = "str" }
+                );
+                if (userData.Count() > 0)
+                    throw new BadRequestException("Username already in use");
 
                 // hash password
                 body.Password = _pwHasher.HashPassword(body, body.Password!);
@@ -95,10 +96,9 @@ namespace BookReaderAPI.Controllers
 
                 // remove password from the response body -- we want to keep it secret
                 var user = data.FirstOrDefault();
-                if (user == null) return Created(string.Empty, user);
                 var userDTO = new UserDTO
                 {
-                    Id = user.Id,
+                    Id = user!.Id,
                     Username = user.Username,
                     FirstName = user.FirstName,
                     LastName = user.LastName,
@@ -140,9 +140,7 @@ namespace BookReaderAPI.Controllers
                     new DbParams { Name = "Username", Value = username, Type = "str" }
                 );
                 if (userData.Count() == 0)
-                {
                     throw new BadRequestException("Incorrect username or password");
-                }
 
                 // check password
                 var userObj = userData.First();
