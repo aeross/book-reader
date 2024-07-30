@@ -1,4 +1,6 @@
-﻿using BookReaderAPI.Entities;
+﻿using BookReaderAPI.Data;
+using BookReaderAPI.DTOs;
+using BookReaderAPI.Entities;
 using BookReaderAPI.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using System.Buffers.Text;
@@ -35,15 +37,40 @@ namespace BookReaderAPI.Controllers
         /// Uploads file for the User entity.
         /// </summary>
         [HttpPost("upload-user")]
-        public IActionResult UploadUser(int id, string base64)
+        public IActionResult UploadUser([FromBody] string base64)
         {
             try
             {
-                // upload file for user
-                // if the file already exists, replace it
-                
+                Authenticate();
 
-                var result = GetAPIResult(200);
+                var userList = _context.ExecQuery(
+                    Entities.User.GetByUsernameQuery(),
+                    new DbParams { Name = "Username", Value = User.Identity!.Name!, Type = "str" }
+                );
+                var userData = userList.First();
+                var user = new User
+                {
+                    Id = userData.id,
+                    FirstName = userData.first_name,
+                    LastName = userData.last_name,
+                    ProfilePicFileId = userData.profile_pic_file_id
+                };
+
+                if (user.ProfilePicFileId == null)
+                {
+                    var file = _context.Insert(new Entities.File { Base64 = base64 });
+                    var fileId = (file.First() as Entities.File)!.Id;
+                    user.ProfilePicFileId = fileId;
+
+                    _context.Update(user.Id, user);
+                }
+                else
+                {
+                    int fileId = user.ProfilePicFileId ?? default;
+                    _context.Update(fileId, new Entities.File { Base64 = base64 });
+                }
+
+                var result = GetAPIResult(200, "File uploaded");
                 return Ok(result);
             }
             catch (Exception e)
@@ -78,7 +105,7 @@ namespace BookReaderAPI.Controllers
                     _context.Update(fileId, new Entities.File { Base64 = base64 });
                 }
 
-                var result = GetAPIResult(200, "Updated");
+                var result = GetAPIResult(200, "File uploaded");
                 return Ok(result);
             }
             catch (Exception e)

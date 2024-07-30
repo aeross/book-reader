@@ -122,12 +122,22 @@ namespace BookReaderAPI.Data
                 }
 
                 NpgsqlDataReader dr = cmd.ExecuteReader();
+
+                // we can't do yield return here because yield return *requires* the code's
+                // output to be read first (for example in this case, when calling Insert()
+                // i.e., var output = _context.Insert(newData), the output needs to be read
+                // with output.First() first in order for the insert operation to be executed).
+                // ---
+                // we don't want that, because there are cases where we don't really need to access the
+                // output of the newly inserted value, we simply want to insert the value into the database.
+                var output = new List<dynamic>();
                 while (dr.Read())
                 {
-                    yield return T.Create(dr);
+                    output.Add(T.Create(dr));
                 }
 
                 conn.Close();
+                return output;
             }
         }
 
@@ -162,12 +172,14 @@ namespace BookReaderAPI.Data
                 }
 
                 NpgsqlDataReader dr = cmd.ExecuteReader();
+                var output = new List<dynamic>();
                 while (dr.Read())
                 {
-                    yield return T.Create(dr);
+                    output.Add(T.Create(dr));
                 }
 
                 conn.Close();
+                return output;
             }
         }
 
@@ -186,12 +198,14 @@ namespace BookReaderAPI.Data
                 cmd.Parameters.AddWithValue("@id", id);
 
                 NpgsqlDataReader dr = cmd.ExecuteReader();
+                var output = new List<dynamic>();
                 while (dr.Read())
                 {
-                    yield return T.Create(dr);
+                    output.Add(T.Create(dr));
                 }
 
                 conn.Close();
+                return output;
             }
         }
         #endregion

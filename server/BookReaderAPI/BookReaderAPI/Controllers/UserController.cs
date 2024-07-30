@@ -28,10 +28,8 @@ namespace BookReaderAPI.Controllers
         {
             try
             {
-                bool isAuthd = User.Identity!.IsAuthenticated;
-                if (!isAuthd) return Unauthorized(GetAPIResult(401, "Invalid token"));
-
-                return this.GetByUsername(User.Identity.Name!);
+                Authenticate();
+                return this.GetByUsername(User.Identity!.Name!);
             }
             catch (Exception e)
             {

@@ -24,7 +24,7 @@ namespace BookReaderAPI.Entities
         static string IEntity.InsertQuery()
         {
             return @"
-            INSERT INTO public.files(base_64)
+            INSERT INTO public.files(base_64, created_at, updated_at)
             VALUES (@Base64, now(), now())
             RETURNING *;
             ";

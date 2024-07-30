@@ -21,16 +21,15 @@ namespace BookReaderAPI.Controllers
             Console.WriteLine(e);
 
             var errorType = e.GetType();
-            if (errorType.Equals(typeof(BadRequestException)))
+            if (errorType.IsSubclassOf(typeof(APIException)))
             {
-                return BadRequest(GetAPIResult(400, e.Message));
+                var code = ((APIException)e).ErrorCode;
+                return StatusCode(code, GetAPIResult(code, e.Message));
             }
-            else if (errorType.Equals(typeof(NotFoundException)))
+            else
             {
-                return NotFound(GetAPIResult(404, e.Message));
+                return StatusCode(500, GetAPIResult(500, e.Message));
             }
-
-            return StatusCode(500, GetAPIResult(500, e.Message));
         }
 
         [NonAction]
@@ -50,6 +49,19 @@ namespace BookReaderAPI.Controllers
                 _ => throw new ArgumentException("Invalid status code"),
             };
             return new APIResult(code, message, data);
+        }
+
+        /// <summary>
+        /// Call this method at the very top when you need to protect an endpoint with authentication.
+        /// </summary>
+        /// <exception cref="UnauthorizedException"></exception>
+        [NonAction]
+        protected void Authenticate()
+        {
+            if (User.Identity == null) throw new UnauthorizedException("Invalid user identity");
+
+            bool isAuthd = User.Identity.IsAuthenticated;
+            if (!isAuthd) throw new UnauthorizedException("Invalid token");
         }
     }
 }
