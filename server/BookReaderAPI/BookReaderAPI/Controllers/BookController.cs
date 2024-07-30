@@ -12,9 +12,16 @@ namespace BookReaderAPI.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            var data = _context.Get<Book>();
-            var result = GetAPIResult(200, data);
-            return Ok(result);
+            try
+            {
+                var data = _context.Get<Book>();
+                var result = GetAPIResult(200, data);
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
         }
 
         [HttpGet("{id}")]

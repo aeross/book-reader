@@ -33,6 +33,9 @@ namespace BookReaderAPI.Entities
             ";
         }
 
+        /// <summary>
+        /// can't update the cover_img_file_id here, use UpdateFile instead
+        /// </summary>
         static string IEntity.UpdateQuery()
         {
             return @"
@@ -50,6 +53,17 @@ namespace BookReaderAPI.Entities
         static string IEntity.DeleteQuery()
         {
             return "DELETE FROM public.books WHERE id = @id RETURNING *";
+        }
+
+        public static string UpdateFile()
+        {
+            return @"
+            UPDATE public.books
+            SET cover_img_file_id = @CoverImgFileId
+                updated_at = now()
+            WHERE id = @id
+            RETURNING *;
+            ";
         }
 
 

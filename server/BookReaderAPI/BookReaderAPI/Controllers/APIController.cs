@@ -28,7 +28,7 @@ namespace BookReaderAPI.Controllers
             }
             else
             {
-                return StatusCode(500, GetAPIResult(500, e.Message));
+                return StatusCode(500, GetAPIResult(500, e.Message + " Stack Trace " + e.StackTrace));
             }
         }
 
