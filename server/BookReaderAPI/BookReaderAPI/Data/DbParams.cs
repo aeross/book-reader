@@ -7,9 +7,11 @@ namespace BookReaderAPI.Data
         public required string Name { get; set; }
         public required string Value { get; set; }
 
-        // the type can only be one of these four:
-        // String, Integer, Boolean, Decmial
-        // other than that, the value will default to string
+        /// <summary>
+        /// The type can only be one of these four: 
+        /// string, int, bool, or decmial. 
+        /// Other than that, the value will default to string.
+        /// </summary>
         public required string Type { get; set; }
     }
 }

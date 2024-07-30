@@ -23,10 +23,9 @@ namespace BookReaderAPI.Data
             throw new Exception("Connection string not found");
         }
 
-        /**
-         * Converts data from db to a recognised .NET datatype (such as int, string, etc).
-         * Handles null checks as well.
-         */
+        /// <summary>
+        /// Converts data from db to a recognised.NET datatype(such as int, string, etc).
+        /// </summary>
         public static T ConvertFromDBVal<T>(object obj)
         {
             if (obj == null || obj == DBNull.Value)
@@ -39,6 +38,12 @@ namespace BookReaderAPI.Data
             }
         }
 
+
+        /// <summary>
+        /// One of the standard CRUD methods.
+        /// </summary>
+        /// <returns>T, where T is an inherited member of IEntity.</returns>
+        #region CRUD
         public IEnumerable<dynamic> Get<T>() where T : IEntity
         {
             using (NpgsqlConnection conn = GetConnection())
@@ -58,7 +63,10 @@ namespace BookReaderAPI.Data
             }
         }
 
-
+        /// <summary>
+        /// One of the standard CRUD methods.
+        /// </summary>
+        /// <returns>T, where T is an inherited member of IEntity.</returns>
         public IEnumerable<dynamic> GetById<T>(int id) where T : IEntity
         {
             using (NpgsqlConnection conn = GetConnection())
@@ -79,6 +87,10 @@ namespace BookReaderAPI.Data
             }
         }
 
+        /// <summary>
+        /// One of the standard CRUD methods.
+        /// </summary>
+        /// <returns>T, where T is an inherited member of IEntity.</returns>
         public IEnumerable<dynamic> Insert<T>(T data) where T : IEntity
         {
             using (NpgsqlConnection conn = GetConnection())
@@ -119,6 +131,10 @@ namespace BookReaderAPI.Data
             }
         }
 
+        /// <summary>
+        /// One of the standard CRUD methods.
+        /// </summary>
+        /// <returns>T, where T is an inherited member of IEntity.</returns>
         public IEnumerable<dynamic> Update<T>(int id, T data) where T : IEntity
         {
             using (NpgsqlConnection conn = GetConnection())
@@ -155,6 +171,10 @@ namespace BookReaderAPI.Data
             }
         }
 
+        /// <summary>
+        /// One of the standard CRUD methods.
+        /// </summary>
+        /// <returns>T, where T is an inherited member of IEntity.</returns>
         public IEnumerable<dynamic> Delete<T>(int id) where T : IEntity
         {
             using (NpgsqlConnection conn = GetConnection())
@@ -174,8 +194,15 @@ namespace BookReaderAPI.Data
                 conn.Close();
             }
         }
+        #endregion
 
-        // execute custom SQL query with or without params.
+        /// <summary>
+        /// Executes a custom SQL Query.
+        /// </summary>
+        /// <param name="query">The SQL query to be executed.</param>
+        /// <param name="listParams">The parameters in the query.</param>
+        /// <returns>A list of ExpandoObject, since the return type is generalised to be unknown.
+        /// Cheecking whether the list contains a length of more than 0 is recommended.</returns>
         public IEnumerable<dynamic> ExecQuery(string query, params DbParams[] listParams)
         {
             using (NpgsqlConnection conn = GetConnection())

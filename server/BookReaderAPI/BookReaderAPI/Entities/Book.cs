@@ -27,8 +27,8 @@ namespace BookReaderAPI.Entities
         static string IEntity.InsertQuery()
         {
             return @"
-            INSERT INTO public.books(genre, title, tagline, description, cover_img_file_id, created_at, updated_at)
-            VALUES (@Genre, @Title, @Tagline, @Description, @CoverImgFileId, now(), now())
+            INSERT INTO public.books(genre, title, tagline, description, created_at, updated_at)
+            VALUES (@Genre, @Title, @Tagline, @Description, now(), now())
             RETURNING *;
             ";
         }
@@ -41,7 +41,6 @@ namespace BookReaderAPI.Entities
                 title = @Title,
                 tagline = @Tagline,
                 description = @Description,
-                cover_img_file_id = @CoverImgFileId,
                 updated_at = now()
             WHERE id = @id
             RETURNING *;

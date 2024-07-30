@@ -29,8 +29,8 @@ namespace BookReaderAPI.Entities
         static string IEntity.InsertQuery()
         {
             return @"
-            INSERT INTO public.users(username, first_name, last_name, password, profile_pic_file_id, created_at, updated_at)
-            VALUES (@Username, @FirstName, @LastName, @Password, @ProfilePicFileId, now(), now())
+            INSERT INTO public.users(username, first_name, last_name, password, created_at, updated_at)
+            VALUES (@Username, @FirstName, @LastName, @Password, now(), now())
             RETURNING *;
             ";
         }
@@ -41,7 +41,6 @@ namespace BookReaderAPI.Entities
             UPDATE public.users
             SET first_name = @FirstName,
                 last_name = @LastName,
-                profile_pic_file_id = @ProfilePicFileId,
                 updated_at = now()
             WHERE id = @id
             RETURNING *;
