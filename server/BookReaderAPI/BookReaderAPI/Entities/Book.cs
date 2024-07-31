@@ -65,7 +65,7 @@ namespace BookReaderAPI.Entities
         {
             return @"
             UPDATE public.books
-            SET cover_img_file_id = @CoverImgFileId
+            SET cover_img_file_id = @CoverImgFileId,
                 updated_at = now()
             WHERE id = @id
             RETURNING *;
@@ -117,6 +117,7 @@ namespace BookReaderAPI.Entities
                 Title = DbContext.ConvertFromDBVal<string>(record["title"]),
                 Tagline = DbContext.ConvertFromDBVal<string>(record["tagline"]),
                 Description = DbContext.ConvertFromDBVal<string>(record["description"]),
+                CoverImgFileId = DbContext.ConvertFromDBVal<int>(record["cover_img_file_id"]),
                 CreatedAt = DbContext.ConvertFromDBVal<DateTime>(record["created_at"]),
                 UpdatedAt = DbContext.ConvertFromDBVal<DateTime>(record["updated_at"])
             };

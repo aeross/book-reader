@@ -71,7 +71,7 @@ namespace BookReaderAPI.Controllers
         {
             try
             {
-                Authorize(id);
+                AuthorizeBookAuthor(id);
 
                 var data = _context.Update<Book>(id, body);
 
@@ -89,7 +89,7 @@ namespace BookReaderAPI.Controllers
         {
             try
             {
-                Authorize(id);
+                AuthorizeBookAuthor(id);
 
                 var data = _context.Delete<Book>(id);
 
@@ -110,35 +110,15 @@ namespace BookReaderAPI.Controllers
             {
                 var authors = _context.ExecQuery(
                     Book.GetBookAuthors(),
-                    new DbParams { Name = "BookId", Value = bookId.ToString(), Type = "int" });
+                    new DbParams { Name = "BookId", Value = bookId });
 
                 if (!authors.Any()) throw new NotFoundException("Data not found");
 
-                return Ok();
+                return Ok(GetAPIResult(200, authors));
             }
             catch (Exception e)
             {
                 return HandleException(e);
-            }
-        }
-
-        [NonAction]
-        protected void Authorize(int bookId)
-        {
-            var userId = Authenticate();
-
-            var existsBook = _context.GetById<Book>(bookId);
-            if (!existsBook.Any()) throw new NotFoundException("Data not found");
-
-            var ownsBook = _context.ExecQuery(
-                Book.CheckBookOwnedByAuthor(),
-                new DbParams { Name = "BookId", Value = bookId.ToString(), Type = "int" },
-                new DbParams { Name = "UserId", Value = userId, Type = "int" }
-            );
-
-            if (!ownsBook.Any())
-            {
-                throw new UnauthorizedException("You have no access");
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using BookReaderAPI.Data;
+using BookReaderAPI.Entities;
 using BookReaderAPI.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -69,6 +70,33 @@ namespace BookReaderAPI.Controllers
             var claims = identity.Claims;
             var userId = claims.First(claim => claim.Type.Equals(ClaimTypes.NameIdentifier)).Value;
             return userId;
+        }
+
+        /// <summary>
+        /// Checks whether the book with book id = bookId is owned by the currently logged-in user.
+        /// </summary>
+        /// <exception cref="NotFoundException"></exception>
+        /// <exception cref="UnauthorizedException"></exception>
+        [NonAction]
+        protected Book AuthorizeBookAuthor(int bookId)
+        {
+            var userId = Authenticate();
+
+            var book = _context.GetById<Book>(bookId);
+            if (!book.Any()) throw new NotFoundException("Data not found");
+
+            var ownsBook = _context.ExecQuery(
+                Book.CheckBookOwnedByAuthor(),
+                new DbParams { Name = "BookId", Value = bookId },
+                new DbParams { Name = "UserId", Value = userId, Type = "int" }
+            );
+
+            if (!ownsBook.Any())
+            {
+                throw new UnauthorizedException("You have no access");
+            }
+
+            return book.First();
         }
     }
 }

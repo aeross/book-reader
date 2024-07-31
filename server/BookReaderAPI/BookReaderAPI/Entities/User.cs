@@ -72,6 +72,7 @@ namespace BookReaderAPI.Entities
                 FirstName = DbContext.ConvertFromDBVal<string>(record["first_name"]),
                 LastName = DbContext.ConvertFromDBVal<string>(record["last_name"]),
                 Password = DbContext.ConvertFromDBVal<string>(record["password"]),
+                ProfilePicFileId = DbContext.ConvertFromDBVal<int>(record["profile_pic_file_id"]),
                 CreatedAt = DbContext.ConvertFromDBVal<DateTime>(record["created_at"]),
                 UpdatedAt = DbContext.ConvertFromDBVal<DateTime>(record["updated_at"])
             };

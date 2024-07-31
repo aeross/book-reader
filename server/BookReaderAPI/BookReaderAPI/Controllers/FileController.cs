@@ -2,6 +2,7 @@
 using BookReaderAPI.DTOs;
 using BookReaderAPI.Entities;
 using BookReaderAPI.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Buffers.Text;
 using System.Security.Claims;
@@ -35,14 +36,17 @@ namespace BookReaderAPI.Controllers
         }
 
         /// <summary>
-        /// Uploads file for the User entity.
+        /// Uploads profile pic file for the User entity.
         /// </summary>
-        [HttpPost("upload-user")]
-        public IActionResult UploadUser([FromBody] string base64)
+        [HttpPatch("user")]
+        public IActionResult UploadsUser([FromBody] Entities.File fReq)
         {
             try
             {
                 Authenticate();
+
+                string base64 = fReq.Base64 ?? "";
+                if (string.IsNullOrEmpty(base64)) throw new BadRequestException("Base64 is required");
 
                 var userList = _context.ExecQuery(
                     Entities.User.GetByUsernameQuery(),
@@ -81,24 +85,26 @@ namespace BookReaderAPI.Controllers
         }
 
         /// <summary>
-        /// Uploads file for the Book entity.
+        /// Uploads cover image file for the Book entity.
         /// </summary>
-        [HttpPost("upload-book")]
-        public IActionResult UploadBook(int id, string base64)
+        [HttpPatch("book/{bookId}")]
+        public IActionResult UploadBook(int bookId, [FromBody] Entities.File fReq)
         {
             try
             {
-                var bookList = _context.GetById<Book>(id);
-                if (!bookList.Any()) throw new NotFoundException("Book not found");
-                var book = bookList.First() as Book;
+                var book = AuthorizeBookAuthor(bookId);
+
+                string base64 = fReq.Base64 ?? "";
+                if (string.IsNullOrEmpty(base64)) throw new BadRequestException("Base64 is required");
 
                 if (book!.CoverImgFileId == null)
                 {
                     var file = _context.Insert(new Entities.File { Base64 = base64 });
                     var fileId = (file.First() as Entities.File)!.Id;
-                    book.CoverImgFileId = fileId;
 
-                    _context.Update(book.Id, book);
+                    _context.ExecQuery(
+                        Book.UpdateFile(), 
+                        new DbParams { Name = "CoverImgFileId", Value = fileId });
                 }
                 else
                 {
@@ -107,6 +113,98 @@ namespace BookReaderAPI.Controllers
                 }
 
                 var result = GetAPIResult(200, "File uploaded");
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+
+
+        /// <summary>
+        /// Deletes profile pic file from the User entity.
+        /// </summary>
+        [HttpDelete("user")]
+        public IActionResult DeleteUser()
+        {
+            try
+            {
+                var userIdStr = Authenticate();
+                string msgOutput = "File deleted";
+
+                //var userList = _context.ExecQuery(
+                //    Entities.User.GetByUsernameQuery(),
+                //    new DbParams { Name = "Username", Value = User.Identity!.Name!, Type = "str" }
+                //);
+                //var userData = userList.First();
+                //var user = new User
+                //{
+                //    Id = userData.id,
+                //    FirstName = userData.first_name,
+                //    LastName = userData.last_name,
+                //    ProfilePicFileId = userData.profile_pic_file_id
+                //};
+                int userId = Convert.ToInt32(userIdStr);
+                var userList = _context.GetById<User>(userId);
+                User user = userList.First();
+
+                if (user.ProfilePicFileId == null || user.ProfilePicFileId == 0)
+                {
+                    msgOutput = "Nothing to delete";
+                }
+                else
+                {
+                    int fileId = user.ProfilePicFileId ?? default;
+                    user.ProfilePicFileId = null;
+
+                    // delete from users first, bcs of FK constraint
+                    _context.Update(userId, user);
+
+                    // then from files
+                    _context.Delete<Entities.File>(fileId);
+                }
+
+                var result = GetAPIResult(200, msgOutput);
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+
+        /// <summary>
+        /// Deletes cover image file for the Book entity.
+        /// </summary>
+        [HttpDelete("book/{bookId}")]
+        public IActionResult DeleteBook(int bookId)
+        {
+            try
+            {
+                var book = AuthorizeBookAuthor(bookId);
+                string msgOutput = "File deleted";
+
+                if (book!.CoverImgFileId == null || book!.CoverImgFileId == 0)
+                {
+                    msgOutput = "Nothing to delete";
+                }
+                else
+                {
+                    int fileId = book.CoverImgFileId ?? default;
+                    book.CoverImgFileId = null;
+
+                    // delete from books first, bcs of FK constraint
+                    _context.ExecQuery(
+                        Book.UpdateFile(),
+                        new DbParams { Name = "CoverImgFileId", Value = null }
+                    );
+
+                    // then from files
+                    _context.Delete<Entities.File>(fileId);
+                }
+
+                var result = GetAPIResult(200, msgOutput);
                 return Ok(result);
             }
             catch (Exception e)

@@ -228,6 +228,12 @@ namespace BookReaderAPI.Data
                 {
                     foreach (var item in listParams)
                     {
+                        if (item.Value == null)
+                        {
+                            cmd.Parameters.AddWithValue(item.Name, DBNull.Value);
+                            continue;
+                        }
+
                         var type = item.Type;
                         if (type == "string" || type == "str")
                         {
