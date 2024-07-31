@@ -59,7 +59,7 @@ namespace BookReaderAPI.Controllers
         /// <exception cref="UnauthorizedException"></exception>
         /// <returns>The authenticated user id.</returns>
         [NonAction]
-        protected string Authenticate()
+        protected int Authenticate()
         {
             if (User.Identity == null) throw new UnauthorizedException("Invalid user identity");
             var identity = (ClaimsIdentity)User.Identity;
@@ -69,31 +69,29 @@ namespace BookReaderAPI.Controllers
 
             var claims = identity.Claims;
             var userId = claims.First(claim => claim.Type.Equals(ClaimTypes.NameIdentifier)).Value;
-            return userId;
+            return Convert.ToInt32(userId);
         }
 
         /// <summary>
-        /// Checks whether the book with book id = bookId is owned by the currently logged-in user.
+        /// Checks whether the book with book id = bookId is owned by the user with user id = userId.
         /// </summary>
         /// <exception cref="NotFoundException"></exception>
         /// <exception cref="UnauthorizedException"></exception>
         [NonAction]
-        protected Book AuthorizeBookAuthor(int bookId)
+        protected Book AuthorizeBookAuthor(int userId, int bookId)
         {
-            var userId = Authenticate();
-
             var book = _context.GetById<Book>(bookId);
             if (!book.Any()) throw new NotFoundException("Data not found");
 
             var ownsBook = _context.ExecQuery(
                 Book.CheckBookOwnedByAuthor(),
                 new DbParams { Name = "BookId", Value = bookId },
-                new DbParams { Name = "UserId", Value = userId, Type = "int" }
+                new DbParams { Name = "UserId", Value = userId }
             );
 
             if (!ownsBook.Any())
             {
-                throw new UnauthorizedException("You have no access");
+                throw new ForbiddenException("You have no access");
             }
 
             return book.First();

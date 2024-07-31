@@ -92,7 +92,8 @@ namespace BookReaderAPI.Controllers
         {
             try
             {
-                var book = AuthorizeBookAuthor(bookId);
+                int userId = Authenticate();
+                var book = AuthorizeBookAuthor(userId, bookId);
 
                 string base64 = fReq.Base64 ?? "";
                 if (string.IsNullOrEmpty(base64)) throw new BadRequestException("Base64 is required");
@@ -133,18 +134,6 @@ namespace BookReaderAPI.Controllers
                 var userIdStr = Authenticate();
                 string msgOutput = "File deleted";
 
-                //var userList = _context.ExecQuery(
-                //    Entities.User.GetByUsernameQuery(),
-                //    new DbParams { Name = "Username", Value = User.Identity!.Name!, Type = "str" }
-                //);
-                //var userData = userList.First();
-                //var user = new User
-                //{
-                //    Id = userData.id,
-                //    FirstName = userData.first_name,
-                //    LastName = userData.last_name,
-                //    ProfilePicFileId = userData.profile_pic_file_id
-                //};
                 int userId = Convert.ToInt32(userIdStr);
                 var userList = _context.GetById<User>(userId);
                 User user = userList.First();
@@ -182,7 +171,8 @@ namespace BookReaderAPI.Controllers
         {
             try
             {
-                var book = AuthorizeBookAuthor(bookId);
+                int userId = Authenticate();
+                var book = AuthorizeBookAuthor(userId, bookId);
                 string msgOutput = "File deleted";
 
                 if (book!.CoverImgFileId == null || book!.CoverImgFileId == 0)

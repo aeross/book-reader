@@ -47,17 +47,10 @@ namespace BookReaderAPI.Controllers
         {
             try
             {
+                int userId = Authenticate();
+
                 body = Chapter.Validate(body);
-
-                // enforce unique constraint
-                string query = Chapter.GetByBookQuery();
-                var chapter = _context.ExecQuery(
-                    query,
-                    new DbParams { Name = "BookId", Value = body.BookId.ToString(), Type = "int" },
-                    new DbParams { Name = "Ordering", Value = body.Ordering.ToString(), Type = "int" }
-                );
-
-                if (chapter.Count() > 0) throw new BadRequestException("Duplicate value for (BookId, Ordering) is not allowed");
+                AuthorizeBookAuthor(userId, body.BookId);
 
                 var data = _context.Insert<Chapter>(body);
 
@@ -75,6 +68,13 @@ namespace BookReaderAPI.Controllers
         {
             try
             {
+                int userId = Authenticate();
+
+                var ch = _context.GetById<Chapter>(id);
+                if (!ch.Any()) throw new NotFoundException("Data not found");
+
+                AuthorizeBookAuthor(userId, ch.First().BookId);
+
                 body = Chapter.Validate(body);
                 var data = _context.Update<Chapter>(id, body);
 
@@ -92,8 +92,40 @@ namespace BookReaderAPI.Controllers
         {
             try
             {
+                int userId = Authenticate();
+                
+                var ch = _context.GetById<Chapter>(id);
+                if (!ch.Any()) throw new NotFoundException("Data not found");
+
+                AuthorizeBookAuthor(userId, ch.First().BookId);
+
                 var data = _context.Delete<Chapter>(id);
-                if (!data.Any()) throw new NotFoundException("Data not found");
+
+                var result = GetAPIResult(200, data);
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+
+
+        [HttpGet("book/{bookId}")]
+        public IActionResult GetAllChaptersInABook(int bookId)
+        {
+            try
+            {
+                var data = _context.ExecQuery(
+                    Chapter.GetAllChaptersInABook(),
+                    new DbParams { Name = "BookId", Value = bookId }
+                );
+
+                // serialize data to Chapter
+                foreach (var item in data)
+                {
+                    Console.WriteLine(item);
+                }
 
                 var result = GetAPIResult(200, data);
                 return Ok(result);

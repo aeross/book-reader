@@ -71,7 +71,8 @@ namespace BookReaderAPI.Controllers
         {
             try
             {
-                AuthorizeBookAuthor(id);
+                int userId = Authenticate();
+                AuthorizeBookAuthor(userId, id);
 
                 var data = _context.Update<Book>(id, body);
 
@@ -89,7 +90,8 @@ namespace BookReaderAPI.Controllers
         {
             try
             {
-                AuthorizeBookAuthor(id);
+                int userId = Authenticate();
+                AuthorizeBookAuthor(userId, id);
 
                 var data = _context.Delete<Book>(id);
 

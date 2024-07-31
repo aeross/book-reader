@@ -31,10 +31,16 @@ namespace BookReaderAPI.Entities
         static string IEntity.InsertQuery()
         {
             return @"
-            INSERT INTO public.chapters(title, content, num_of_words, status,
-                book_id, ordering, type, created_at, updated_at)
-            VALUES (@Title, @Content, @NumOfWords, @Status, 
-                @BookId, @Ordering, @Type, now(), now())
+            INSERT INTO public.chapters(
+                title, content, num_of_words, 
+                status, book_id, ordering, 
+                type, created_at, updated_at
+            )
+            VALUES (
+                @Title, @Content, @NumOfWords, 
+                @Status, @BookId, (SELECT MAX(ordering)+1 FROM public.chapters WHERE book_id = @BookId), 
+                @Type, now(), now()
+            )
             RETURNING *;
             ";
         }
@@ -47,8 +53,6 @@ namespace BookReaderAPI.Entities
                 content = @Content,
                 num_of_words = @NumOfWords,
                 status = @Status,
-                book_id = @BookId,
-                ordering = @Ordering,
                 type = @Type,
                 updated_at = now()
             WHERE id = @id
@@ -63,9 +67,14 @@ namespace BookReaderAPI.Entities
 
 
         // non-standard crud queries
-        public static string GetByBookQuery()
+
+        /// <summary>
+        /// params: @BookId int
+        /// </summary>
+        /// <returns></returns>
+        public static string GetAllChaptersInABook()
         {
-            return "SELECT * FROM public.chapters WHERE book_id = @BookId AND ordering = @Ordering";
+            return "SELECT * FROM public.chapters WHERE book_id = @BookId ORDER BY ordering ASC";
         }
 
 
