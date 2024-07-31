@@ -1,6 +1,7 @@
 ﻿using BookReaderAPI.Data;
 using BookReaderAPI.Exceptions;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace BookReaderAPI.Controllers
 {
@@ -55,13 +56,19 @@ namespace BookReaderAPI.Controllers
         /// Call this method at the very top when you need to protect an endpoint with authentication.
         /// </summary>
         /// <exception cref="UnauthorizedException"></exception>
+        /// <returns>The authenticated user id.</returns>
         [NonAction]
-        protected void Authenticate()
+        protected string Authenticate()
         {
             if (User.Identity == null) throw new UnauthorizedException("Invalid user identity");
+            var identity = (ClaimsIdentity)User.Identity;
 
-            bool isAuthd = User.Identity.IsAuthenticated;
+            bool isAuthd = identity.IsAuthenticated;
             if (!isAuthd) throw new UnauthorizedException("Invalid token");
+
+            var claims = identity.Claims;
+            var userId = claims.First(claim => claim.Type.Equals(ClaimTypes.NameIdentifier)).Value;
+            return userId;
         }
     }
 }

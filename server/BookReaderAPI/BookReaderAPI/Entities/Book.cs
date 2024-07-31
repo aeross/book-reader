@@ -55,6 +55,12 @@ namespace BookReaderAPI.Entities
             return "DELETE FROM public.books WHERE id = @id RETURNING *";
         }
 
+
+        // non-standard CRUD queries
+
+        /// <summary>
+        /// params: @CoverImgFileId int
+        /// </summary>
         public static string UpdateFile()
         {
             return @"
@@ -63,6 +69,41 @@ namespace BookReaderAPI.Entities
                 updated_at = now()
             WHERE id = @id
             RETURNING *;
+            ";
+        }
+
+        /// <summary>
+        /// params: @UserId int, @BookId int
+        /// </summary>
+        public static string InsertBookAuthor()
+        {
+            return @"
+            INSERT INTO public.authors(user_id, book_id, created_at, updated_at)
+            VALUES (@UserId, @BookId, now(), now());
+            ";
+        }
+
+        /// <summary>
+        /// params: @BookId int
+        /// </summary>
+        public static string GetBookAuthors()
+        {
+            return @"
+            SELECT authors.* FROM public.books 
+                INNER JOIN public.authors ON books.id = authors.book_id
+            WHERE books.id = @BookId;
+            ";
+        }
+
+        /// <summary>
+        /// params: @UserId int, @BookId int
+        /// </summary>
+        public static string CheckBookOwnedByAuthor()
+        {
+            return @"
+            SELECT authors.* FROM public.books 
+                INNER JOIN public.authors ON books.id = authors.book_id
+            WHERE books.id = @BookId AND authors.user_id = @UserId;
             ";
         }
 

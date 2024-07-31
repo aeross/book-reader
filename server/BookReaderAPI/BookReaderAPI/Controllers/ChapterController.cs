@@ -31,7 +31,7 @@ namespace BookReaderAPI.Controllers
             try
             {
                 var data = _context.GetById<Chapter>(id);
-                if (data.Count() == 0) throw new NotFoundException("Data not found");
+                if (!data.Any()) throw new NotFoundException("Data not found");
 
                 var result = GetAPIResult(200, data);
                 return Ok(result);
@@ -93,7 +93,7 @@ namespace BookReaderAPI.Controllers
             try
             {
                 var data = _context.Delete<Chapter>(id);
-                if (data.Count() == 0) throw new NotFoundException("Data not found");
+                if (!data.Any()) throw new NotFoundException("Data not found");
 
                 var result = GetAPIResult(200, data);
                 return Ok(result);

@@ -4,6 +4,7 @@ using BookReaderAPI.Entities;
 using BookReaderAPI.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using System.Buffers.Text;
+using System.Security.Claims;
 
 namespace BookReaderAPI.Controllers
 {
@@ -22,7 +23,7 @@ namespace BookReaderAPI.Controllers
             try
             {
                 var data = _context.GetById<Entities.File>(id);
-                if (data.Count() == 0) throw new Exception("Data not found");
+                if (!data.Any()) throw new Exception("Data not found");
 
                 var result = GetAPIResult(200, data);
                 return Ok(result);
@@ -88,7 +89,7 @@ namespace BookReaderAPI.Controllers
             try
             {
                 var bookList = _context.GetById<Book>(id);
-                if (bookList.Count() == 0) throw new NotFoundException("Book not found");
+                if (!bookList.Any()) throw new NotFoundException("Book not found");
                 var book = bookList.First() as Book;
 
                 if (book!.CoverImgFileId == null)

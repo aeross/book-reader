@@ -54,6 +54,10 @@ namespace BookReaderAPI.Entities
         }
 
         // non-standard crud queries
+
+        /// <summary>
+        /// params: @Username str
+        /// </summary>
         public static string GetByUsernameQuery()
         {
             return "SELECT * FROM public.users WHERE username = @Username";

@@ -2,6 +2,8 @@ using BookReaderAPI.Data;
 using BookReaderAPI.Entities;
 using BookReaderAPI.Exceptions;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using System.Security.Claims;
 
 namespace BookReaderAPI.Controllers
 {
@@ -30,7 +32,7 @@ namespace BookReaderAPI.Controllers
             try
             {
                 var data = _context.GetById<Book>(id);
-                if (data.Count() == 0) throw new NotFoundException("Data not found");
+                if (!data.Any()) throw new NotFoundException("Data not found");
 
                 var result = GetAPIResult(200, data);
                 return Ok(result);
@@ -46,7 +48,14 @@ namespace BookReaderAPI.Controllers
         {
             try
             {
+                var userId = Authenticate();
+
                 var data = _context.Insert<Book>(body);
+                _context.ExecQuery(
+                    Book.InsertBookAuthor(),
+                    new DbParams { Name = "BookId", Value = data.First().Id.ToString(), Type = "int" },
+                    new DbParams { Name = "UserId", Value = userId, Type = "int" }
+                );
 
                 var result = GetAPIResult(201, data);
                 return Created(string.Empty, result);
@@ -62,6 +71,8 @@ namespace BookReaderAPI.Controllers
         {
             try
             {
+                Authorize(id);
+
                 var data = _context.Update<Book>(id, body);
 
                 var result = GetAPIResult(200, data);
@@ -78,8 +89,9 @@ namespace BookReaderAPI.Controllers
         {
             try
             {
+                Authorize(id);
+
                 var data = _context.Delete<Book>(id);
-                if (data.Count() == 0) throw new NotFoundException("Data not found");
 
                 var result = GetAPIResult(200, data);
                 return Ok(result);
@@ -87,6 +99,46 @@ namespace BookReaderAPI.Controllers
             catch (Exception e)
             {
                 return HandleException(e);
+            }
+        }
+
+
+        [HttpGet("authors/{bookId}")]
+        public IActionResult GetBookAuthors(int bookId)
+        {
+            try
+            {
+                var authors = _context.ExecQuery(
+                    Book.GetBookAuthors(),
+                    new DbParams { Name = "BookId", Value = bookId.ToString(), Type = "int" });
+
+                if (!authors.Any()) throw new NotFoundException("Data not found");
+
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+
+        [NonAction]
+        protected void Authorize(int bookId)
+        {
+            var userId = Authenticate();
+
+            var existsBook = _context.GetById<Book>(bookId);
+            if (!existsBook.Any()) throw new NotFoundException("Data not found");
+
+            var ownsBook = _context.ExecQuery(
+                Book.CheckBookOwnedByAuthor(),
+                new DbParams { Name = "BookId", Value = bookId.ToString(), Type = "int" },
+                new DbParams { Name = "UserId", Value = userId, Type = "int" }
+            );
+
+            if (!ownsBook.Any())
+            {
+                throw new UnauthorizedException("You have no access");
             }
         }
     }

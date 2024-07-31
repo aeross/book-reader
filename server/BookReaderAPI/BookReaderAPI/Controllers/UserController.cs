@@ -47,7 +47,7 @@ namespace BookReaderAPI.Controllers
                     Entities.User.GetByUsernameQuery(),
                     new DbParams { Name = "Username", Value = username, Type = "str" }
                 );
-                if (user == null || user.Count() == 0) throw new NotFoundException("Data not found");
+                if (user == null || !user.Any()) throw new NotFoundException("Data not found");
 
                 var userData = user.First();
 
@@ -84,7 +84,7 @@ namespace BookReaderAPI.Controllers
                     Entities.User.GetByUsernameQuery(),
                     new DbParams { Name = "Username", Value = body.Username!, Type = "str" }
                 );
-                if (userData.Count() > 0)
+                if (userData.Any())
                     throw new BadRequestException("Username already in use");
 
                 // hash password
@@ -149,7 +149,8 @@ namespace BookReaderAPI.Controllers
                 }
 
                 // generate token
-                var token = GenerateToken(username, userObj.first_name, userObj.last_name);
+                string userId = userObj.id.ToString();
+                var token = GenerateToken(userId, username, userObj.first_name, userObj.last_name);
                 var result = GetAPIResult(200, token);
 
                 return Ok(result);
@@ -162,7 +163,7 @@ namespace BookReaderAPI.Controllers
 
 
         [NonAction]
-        private string GenerateToken(string username, string firstname, string lastname)
+        private string GenerateToken(string userId, string username, string firstname, string lastname)
         {
             // firstly here, we've got a `Claim` type.
             // this is the data (username, password) that is sent after the user logins.
@@ -171,6 +172,7 @@ namespace BookReaderAPI.Controllers
             // this method will not be called if the input validation fails in Login().
             var claims = new List<Claim>
             {
+                new Claim(ClaimTypes.NameIdentifier, userId),
                 new Claim(ClaimTypes.Name, username),
                 new Claim(ClaimTypes.Name, firstname),
                 new Claim(ClaimTypes.Name, lastname)
