@@ -1,4 +1,5 @@
 using BookReaderAPI.Data;
+using BookReaderAPI.DTOs;
 using BookReaderAPI.Entities;
 using BookReaderAPI.Exceptions;
 using Microsoft.AspNetCore.Mvc;
@@ -116,7 +117,23 @@ namespace BookReaderAPI.Controllers
 
                 if (!authors.Any()) throw new NotFoundException("Data not found");
 
-                return Ok(GetAPIResult(200, authors));
+                //// serialize to User objects
+                List<UserDTO> users = new();
+                foreach (var item in authors)
+                {
+                    users.Add(new UserDTO
+                    {
+                        Id = item.id,
+                        Username = item.username,
+                        FirstName = item.first_name,
+                        LastName = item.last_name,
+                        ProfilePicFileId = item.profile_pic_file_id,
+                        CreatedAt = item.created_at,
+                        UpdatedAt = item.updated_at
+                    });
+                }
+
+                return Ok(GetAPIResult(200, users));
             }
             catch (Exception e)
             {

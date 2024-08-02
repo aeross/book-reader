@@ -89,8 +89,9 @@ namespace BookReaderAPI.Entities
         public static string GetBookAuthors()
         {
             return @"
-            SELECT authors.* FROM public.books 
+            SELECT users.* FROM public.books 
                 INNER JOIN public.authors ON books.id = authors.book_id
+                INNER JOIN public.users ON authors.user_id = users.id
             WHERE books.id = @BookId;
             ";
         }

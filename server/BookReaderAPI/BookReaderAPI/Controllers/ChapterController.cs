@@ -1,4 +1,5 @@
 using BookReaderAPI.Data;
+using BookReaderAPI.DTOs;
 using BookReaderAPI.Entities;
 using BookReaderAPI.Exceptions;
 using Microsoft.AspNetCore.Mvc;
@@ -121,13 +122,24 @@ namespace BookReaderAPI.Controllers
                     new DbParams { Name = "BookId", Value = bookId }
                 );
 
+                List<ChapterDTO> chapters = new();
                 // serialize data to Chapter
                 foreach (var item in data)
                 {
-                    Console.WriteLine(item);
+                    chapters.Add(new ChapterDTO
+                    {
+                        Id = item.id,
+                        Title = item.title,
+                        NumOfWords = item.num_of_words,
+                        Status = item.status,
+                        BookId = item.book_id,
+                        Ordering = item.ordering,
+                        CreatedAt = item.created_at,
+                        UpdatedAt = item.updated_at
+                    });
                 }
 
-                var result = GetAPIResult(200, data);
+                var result = GetAPIResult(200, chapters);
                 return Ok(result);
             }
             catch (Exception e)
