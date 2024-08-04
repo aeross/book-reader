@@ -48,6 +48,73 @@ namespace BookReaderAPI.Entities
             return "DELETE FROM public.likes WHERE id = @id RETURNING *";
         }
 
+        // non-standard CRUD queries
+
+        /// <summary>
+        /// params: @BookId int
+        /// </summary>
+        public static string GetAllUsersWhoLikesABook()
+        {
+            return @"
+            SELECT users.* FROM public.books
+                INNER JOIN public.likes ON books.id = likes.book_id
+                INNER JOIN public.users ON users.id = likes.user_id
+            WHERE books.id = @BookId;
+            ";
+        }
+
+        /// <summary>
+        /// params: @BookId int
+        /// </summary>
+        public static string CountAllUsersWhoLikesABook()
+        {
+            return @"
+            SELECT COUNT(*) as likes FROM public.books
+                INNER JOIN public.likes ON books.id = likes.book_id
+                INNER JOIN public.users ON users.id = likes.user_id
+            WHERE books.id = @BookId;
+            ";
+        }
+
+        /// <summary>
+        /// params: @Username string
+        /// </summary>
+        public static string GetAllLikedBooksByUser()
+        {
+            return @"
+            SELECT books.* FROM public.books
+                INNER JOIN public.likes ON books.id = likes.book_id
+                INNER JOIN public.users ON users.id = likes.user_id
+            WHERE users.username = @Username;
+            ";
+        }
+
+        /// <summary>
+        /// params: @Username string
+        /// </summary>
+        public static string CountAllLikedBooksByUser()
+        {
+            return @"
+            SELECT COUNT(*) as likes FROM public.books
+                INNER JOIN public.likes ON books.id = likes.book_id
+                INNER JOIN public.users ON users.id = likes.user_id
+            WHERE users.username = @Username;
+            ";
+        }
+
+        /// <summary>
+        /// params: @UserId int, @BookId int
+        /// </summary>
+        public static string CheckIfUserLikesBook()
+        {
+            return @"
+            SELECT likes.* FROM public.books
+                INNER JOIN public.likes ON books.id = likes.book_id
+                INNER JOIN public.users ON users.id = likes.user_id
+            WHERE users.id = @UserId AND books.id = @BookId;
+            ";
+        }
+
         static dynamic IEntity.Create(IDataRecord record)
         {
             return new Like

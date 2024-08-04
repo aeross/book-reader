@@ -26,7 +26,7 @@ namespace BookReaderAPI.Controllers
                 var data = _context.GetById<Entities.File>(id);
                 if (!data.Any()) throw new Exception("Data not found");
 
-                var result = GetAPIResult(200, data);
+                var result = GetAPIResult(data: data);
                 return Ok(result);
             }
             catch (Exception e)
@@ -75,7 +75,7 @@ namespace BookReaderAPI.Controllers
                     _context.Update(fileId, new Entities.File { Base64 = base64 });
                 }
 
-                var result = GetAPIResult(200, "File uploaded");
+                var result = GetAPIResult(data: "File uploaded");
                 return Ok(result);
             }
             catch (Exception e)
@@ -113,7 +113,7 @@ namespace BookReaderAPI.Controllers
                     _context.Update(fileId, new Entities.File { Base64 = base64 });
                 }
 
-                var result = GetAPIResult(200, "File uploaded");
+                var result = GetAPIResult(data: "File uploaded");
                 return Ok(result);
             }
             catch (Exception e)
@@ -154,7 +154,7 @@ namespace BookReaderAPI.Controllers
                     _context.Delete<Entities.File>(fileId);
                 }
 
-                var result = GetAPIResult(200, msgOutput);
+                var result = GetAPIResult(data: msgOutput);
                 return Ok(result);
             }
             catch (Exception e)
@@ -194,7 +194,7 @@ namespace BookReaderAPI.Controllers
                     _context.Delete<Entities.File>(fileId);
                 }
 
-                var result = GetAPIResult(200, msgOutput);
+                var result = GetAPIResult(data: msgOutput);
                 return Ok(result);
             }
             catch (Exception e)

@@ -2,7 +2,6 @@ using BookReaderAPI.Data;
 using BookReaderAPI.DTOs;
 using BookReaderAPI.Entities;
 using BookReaderAPI.Exceptions;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -23,13 +22,84 @@ namespace BookReaderAPI.Controllers
         }
 
         // get all liked books by user
-        [HttpGet]
-        public IActionResult GetAllLikedBooks()
+        [HttpGet("{username}/likes")]
+        public IActionResult GetAllLikedBooks(string username)
         {
             try
             {
-                
-                return Ok();
+                var queryResult = _context.ExecQuery(
+                    Like.GetAllLikedBooksByUser(),
+                    new DbParams { Name = "Username", Value = username }
+                );
+
+                List<BookDTO> books = new();
+                foreach (var item in queryResult)
+                {
+                    var likes = _context.ExecQuery(
+                        Like.CountAllUsersWhoLikesABook(),
+                        new DbParams { Name = "BookId", Value = item.id }
+                    );
+                    var likesCount = likes.First().likes;
+
+                    books.Add(new BookDTO
+                    {
+                        Id = item.id,
+                        Genre = item.genre,
+                        Title = item.title,
+                        Tagline = item.tagline,
+                        Description = item.description,
+                        CoverImgFileId = item.cover_img_file_id,
+                        Views = item.views,
+                        Likes = likesCount,
+                        //Comments = item.comments,
+                        UpdatedAt = item.updated_at,
+                        CreatedAt = item.created_at
+                    });
+                }
+
+                var result = GetAPIResult(data: books);
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+
+        // like or unlike a book
+        [HttpPost("like")]
+        public IActionResult LikeOrUnlikeBook([FromBody] Like like)
+        {
+            try
+            {
+                int userId = Authenticate();
+                int bookId = like.BookId;
+
+                string message = "";
+
+                var checkBook = _context.GetById<Book>(bookId);
+                if (!checkBook.Any()) throw new BadRequestException("Book id not found");
+
+                like.UserId = userId;
+                var checkLike = _context.ExecQuery(
+                    Like.CheckIfUserLikesBook(),
+                    new DbParams { Name = "UserId", Value = userId },
+                    new DbParams { Name = "BookId", Value = bookId }
+                );
+
+                if (!checkLike.Any())
+                {
+                    _context.Insert<Like>(like);
+                    message = "liked";
+                }
+                else
+                {
+                    var likeId = checkLike.First().id;
+                    _context.Delete<Like>(likeId);
+                    message = "unliked";
+                }
+
+                return Ok(GetAPIResult(data: message));
             }
             catch (Exception e)
             {
@@ -78,7 +148,7 @@ namespace BookReaderAPI.Controllers
                     UpdatedAt = userData.updated_at
                 };
 
-                var result = GetAPIResult(200, userDTO);
+                var result = GetAPIResult(data: userDTO);
                 return Ok(result);
             }
             catch (Exception e)
@@ -166,7 +236,7 @@ namespace BookReaderAPI.Controllers
                 // generate token
                 string userId = userObj.id.ToString();
                 var token = GenerateToken(userId, username, userObj.first_name, userObj.last_name);
-                var result = GetAPIResult(200, token);
+                var result = GetAPIResult(data: token);
 
                 return Ok(result);
             }

@@ -18,7 +18,7 @@ namespace BookReaderAPI.Controllers
             try
             {
                 var data = _context.Get<Book>();
-                var result = GetAPIResult(200, data);
+                var result = GetAPIResult(data: data);
                 return Ok(result);
             }
             catch (Exception e)
@@ -35,6 +35,12 @@ namespace BookReaderAPI.Controllers
                 var data = _context.GetById<Book>(id);
                 if (!data.Any()) throw new NotFoundException("Data not found");
 
+                var likes = _context.ExecQuery(
+                    Like.CountAllUsersWhoLikesABook(),
+                    new DbParams { Name = "BookId", Value = id }
+                );
+                var likesCount = likes.First().likes;
+
                 var book = data.First();
                 var bookDTO = new BookDTO
                 {
@@ -45,13 +51,13 @@ namespace BookReaderAPI.Controllers
                     Description = book.Description,
                     CoverImgFileId = book.CoverImgFileId,
                     Views = book.Views,
-                    //Likes = book.likes,
+                    Likes = likesCount,
                     //Comments = book.comments,
                     UpdatedAt = book.UpdatedAt,
                     CreatedAt = book.CreatedAt
                 };
 
-                var result = GetAPIResult(200, bookDTO);
+                var result = GetAPIResult(data: bookDTO);
                 return Ok(result);
             }
             catch (Exception e)
@@ -93,7 +99,7 @@ namespace BookReaderAPI.Controllers
 
                 var data = _context.Update<Book>(id, body);
 
-                var result = GetAPIResult(200, data);
+                var result = GetAPIResult(data: data);
                 return Ok(result);
             }
             catch (Exception e)
@@ -112,7 +118,7 @@ namespace BookReaderAPI.Controllers
 
                 var data = _context.Delete<Book>(id);
 
-                var result = GetAPIResult(200, data);
+                var result = GetAPIResult(data: data);
                 return Ok(result);
             }
             catch (Exception e)
@@ -149,7 +155,7 @@ namespace BookReaderAPI.Controllers
                     });
                 }
 
-                return Ok(GetAPIResult(200, users));
+                return Ok(GetAPIResult(data: users));
             }
             catch (Exception e)
             {

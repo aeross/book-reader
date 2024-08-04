@@ -35,7 +35,7 @@ namespace BookReaderAPI.Controllers
         }
 
         [NonAction]
-        protected APIResult GetAPIResult(int code, dynamic? data = null)
+        protected APIResult GetAPIResult(int code = 200, dynamic? data = null)
         {
             string message = code switch
             {
