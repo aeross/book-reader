@@ -38,7 +38,7 @@ namespace BookReaderAPI.Controllers
         /// <summary>
         /// Uploads profile pic file for the User entity.
         /// </summary>
-        [HttpPatch("user")]
+        [HttpPost("user")]
         public IActionResult UploadsUser([FromBody] Entities.File fReq)
         {
             try
@@ -87,7 +87,7 @@ namespace BookReaderAPI.Controllers
         /// <summary>
         /// Uploads cover image file for the Book entity.
         /// </summary>
-        [HttpPatch("book/{bookId}")]
+        [HttpPost("book/{bookId}")]
         public IActionResult UploadBook(int bookId, [FromBody] Entities.File fReq)
         {
             try

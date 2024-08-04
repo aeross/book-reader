@@ -64,30 +64,6 @@ namespace BookReaderAPI.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] Chapter body)
-        {
-            try
-            {
-                int userId = Authenticate();
-
-                var ch = _context.GetById<Chapter>(id);
-                if (!ch.Any()) throw new NotFoundException("Data not found");
-
-                AuthorizeBookAuthor(userId, ch.First().BookId);
-
-                body = Chapter.Validate(body);
-                var data = _context.Update<Chapter>(id, body);
-
-                var result = GetAPIResult(200, data);
-                return Ok(result);
-            }
-            catch (Exception e)
-            {
-                return HandleException(e);
-            }
-        }
-
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
@@ -140,6 +116,55 @@ namespace BookReaderAPI.Controllers
                 }
 
                 var result = GetAPIResult(200, chapters);
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+
+        // editing the chapters
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, [FromBody] Chapter body)
+        {
+            try
+            {
+                int userId = Authenticate();
+
+                var ch = _context.GetById<Chapter>(id);
+                if (!ch.Any()) throw new NotFoundException("Data not found");
+
+                AuthorizeBookAuthor(userId, ch.First().BookId);
+
+                body = Chapter.Validate(body);
+                var data = _context.Update<Chapter>(id, body);
+
+                var result = GetAPIResult(200, data);
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+
+        [HttpPatch("save-draft/{id}")]
+        public IActionResult SaveDraft(int id, [FromBody] Chapter body)
+        {
+            try
+            {
+                int userId = Authenticate();
+
+                var ch = _context.GetById<Chapter>(id);
+                if (!ch.Any()) throw new NotFoundException("Data not found");
+
+                AuthorizeBookAuthor(userId, ch.First().BookId);
+
+                body = Chapter.Validate(body);
+                var data = _context.Update<Chapter>(id, body);
+
+                var result = GetAPIResult(200, data);
                 return Ok(result);
             }
             catch (Exception e)

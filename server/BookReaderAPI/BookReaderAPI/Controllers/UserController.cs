@@ -22,6 +22,21 @@ namespace BookReaderAPI.Controllers
             _config = config;
         }
 
+        // get all liked books by user
+        [HttpGet]
+        public IActionResult GetAllLikedBooks()
+        {
+            try
+            {
+                
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+
         // get current user
         [HttpGet]
         public IActionResult GetCurrUser()

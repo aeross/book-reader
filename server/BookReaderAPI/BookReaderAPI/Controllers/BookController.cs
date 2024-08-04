@@ -35,7 +35,23 @@ namespace BookReaderAPI.Controllers
                 var data = _context.GetById<Book>(id);
                 if (!data.Any()) throw new NotFoundException("Data not found");
 
-                var result = GetAPIResult(200, data);
+                var book = data.First();
+                var bookDTO = new BookDTO
+                {
+                    Id = book.Id,
+                    Genre = book.Genre,
+                    Title = book.Title,
+                    Tagline = book.Tagline,
+                    Description = book.Description,
+                    CoverImgFileId = book.CoverImgFileId,
+                    Views = book.Views,
+                    //Likes = book.likes,
+                    //Comments = book.comments,
+                    UpdatedAt = book.UpdatedAt,
+                    CreatedAt = book.CreatedAt
+                };
+
+                var result = GetAPIResult(200, bookDTO);
                 return Ok(result);
             }
             catch (Exception e)
@@ -106,7 +122,7 @@ namespace BookReaderAPI.Controllers
         }
 
 
-        [HttpGet("authors/{bookId}")]
+        [HttpGet("author/{bookId}")]
         public IActionResult GetBookAuthors(int bookId)
         {
             try

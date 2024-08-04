@@ -11,6 +11,7 @@ namespace BookReaderAPI.Entities
         public string? Tagline { get; set; }
         public string? Description { get; set; }
         public int? CoverImgFileId { get; set; }
+        public Int64? Views { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 
@@ -27,8 +28,8 @@ namespace BookReaderAPI.Entities
         static string IEntity.InsertQuery()
         {
             return @"
-            INSERT INTO public.books(genre, title, tagline, description, created_at, updated_at)
-            VALUES (@Genre, @Title, @Tagline, @Description, now(), now())
+            INSERT INTO public.books(genre, title, tagline, description, ""views"", created_at, updated_at)
+            VALUES (@Genre, @Title, @Tagline, @Description, 0, now(), now())
             RETURNING *;
             ";
         }
@@ -59,7 +60,7 @@ namespace BookReaderAPI.Entities
         // non-standard CRUD queries
 
         /// <summary>
-        /// params: @CoverImgFileId int
+        /// params: @id int, @CoverImgFileId int
         /// </summary>
         public static string UpdateFile()
         {
@@ -108,6 +109,18 @@ namespace BookReaderAPI.Entities
             ";
         }
 
+        /// <summary>
+        /// params: @id int
+        /// </summary>
+        public static string IncrementViews()
+        {
+            return @"
+            UPDATE public.books
+            SET ""views"" = ""views"" + 1
+            WHERE id = @id;
+            ";
+        }
+
 
         static dynamic IEntity.Create(IDataRecord record)
         {
@@ -119,6 +132,7 @@ namespace BookReaderAPI.Entities
                 Tagline = DbContext.ConvertFromDBVal<string>(record["tagline"]),
                 Description = DbContext.ConvertFromDBVal<string>(record["description"]),
                 CoverImgFileId = DbContext.ConvertFromDBVal<int>(record["cover_img_file_id"]),
+                Views = DbContext.ConvertFromDBVal<Int64>(record["views"]),
                 CreatedAt = DbContext.ConvertFromDBVal<DateTime>(record["created_at"]),
                 UpdatedAt = DbContext.ConvertFromDBVal<DateTime>(record["updated_at"])
             };

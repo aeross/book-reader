@@ -80,8 +80,6 @@ namespace BookReaderAPI.Entities
 
         static dynamic IEntity.Create(IDataRecord record)
         {
-            var test = record["num_of_words"];
-
             return new Chapter
             {
                 Id = (int)record["id"],
