@@ -37,10 +37,8 @@ namespace BookReaderAPI.Entities
         {
             return @"
                 UPDATE public.readlists
-                SET user_id = @UserId,
-                    title = @Title,
-                    description = @Description,
-                    book_id = @BookId,
+                SET title = @Title,
+                    description = @Description,,
                     updated_at = now()
                 WHERE id = @id
                 RETURNING *;
@@ -57,17 +55,50 @@ namespace BookReaderAPI.Entities
         /// <summary>
         /// params: @Username string
         /// </summary>
-        public static string GetReadlistByUser()
+        public static string GetReadlists()
         {
             return @"
-                SELECT books.* FROM public.books
-                    INNER JOIN public.readlists ON readlists.book_id = books.id
+                SELECT readlists.* FROM public.readlists
                     INNER JOIN public.users ON readlists.user_id = users.id
                 WHERE users.username = @Username;
                 ";
         }
 
-        
+        /// <summary>
+        /// params: @ReadlistId int
+        /// </summary>
+        public static string GetAllBooksInAReadlist()
+        {
+            return @"
+                SELECT books.* FROM public.books
+                    INNER JOIN public.booklists ON books.id = booklists.book_id
+                    INNER JOIN public.readlists ON booklists.readlist_id = readlists.id
+                    INNER JOIN public.users ON readlists.user_id = users.id
+                WHERE readlists.id = @ReadlistId;
+                ";
+        }
+
+        /// <summary>
+        /// params: @ReadlistId int, @BookId int
+        /// </summary>
+        public static string AddBookToReadlist()
+        {
+            return @"
+                INSERT INTO public.booklists (readlist_id, book_id, created_at, updated_at)
+                VALUES (@ReadlistId, @BookId, now(), now());
+                ";
+        }
+
+        /// <summary>
+        /// params: @ReadlistId int, @BookId int
+        /// </summary>
+        public static string DeleteBookFromReadlist()
+        {
+            return @"
+                DELETE FROM public.booklists
+                WHERE readlist_id = @ReadlistId AND book_id = @BookId;
+                ";
+        }
 
         static dynamic IEntity.Create(IDataRecord record)
         {

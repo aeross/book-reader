@@ -2,6 +2,7 @@ using BookReaderAPI.Data;
 using BookReaderAPI.DTOs;
 using BookReaderAPI.Entities;
 using BookReaderAPI.Exceptions;
+using BookReaderAPI.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Security.Claims;
@@ -39,23 +40,10 @@ namespace BookReaderAPI.Controllers
                     Like.CountAllUsersWhoLikesABook(),
                     new DbParams { Name = "BookId", Value = id }
                 );
-                var likesCount = likes.First().likes_count;
+                Int64 likesCount = likes.First().likes_count;
 
-                var book = data.First();
-                var bookDTO = new BookDTO
-                {
-                    Id = book.Id,
-                    Genre = book.Genre,
-                    Title = book.Title,
-                    Tagline = book.Tagline,
-                    Description = book.Description,
-                    CoverImgFileId = book.CoverImgFileId,
-                    Views = book.Views,
-                    Likes = likesCount,
-                    //Comments = book.comments,
-                    UpdatedAt = book.UpdatedAt,
-                    CreatedAt = book.CreatedAt
-                };
+                Book book = data.First();
+                BookDTO bookDTO = book.ToDTO(likesCount);
 
                 var result = GetAPIResult(bookDTO);
                 return Ok(result);
