@@ -39,7 +39,7 @@ namespace BookReaderAPI.Controllers
                         Like.CountAllUsersWhoLikesABook(),
                         new DbParams { Name = "BookId", Value = item.id }
                     );
-                    var likesCount = likes.First().likes;
+                    var likesCount = likes.First().likes_count;
 
                     books.Add(new BookDTO
                     {
@@ -57,7 +57,7 @@ namespace BookReaderAPI.Controllers
                     });
                 }
 
-                var result = GetAPIResult(data: books);
+                var result = GetAPIResult(books);
                 return Ok(result);
             }
             catch (Exception e)
@@ -99,7 +99,7 @@ namespace BookReaderAPI.Controllers
                     message = "unliked";
                 }
 
-                return Ok(GetAPIResult(data: message));
+                return Ok(GetAPIResult(message));
             }
             catch (Exception e)
             {
@@ -148,7 +148,7 @@ namespace BookReaderAPI.Controllers
                     UpdatedAt = userData.updated_at
                 };
 
-                var result = GetAPIResult(data: userDTO);
+                var result = GetAPIResult(userDTO);
                 return Ok(result);
             }
             catch (Exception e)
@@ -190,7 +190,7 @@ namespace BookReaderAPI.Controllers
                     UpdatedAt = user.UpdatedAt
                 };
 
-                APIResult result = GetAPIResult(201, userDTO);
+                APIResult result = GetAPIResult(userDTO, 201);
                 return Created(string.Empty, result);
             }
             catch (Exception e)
@@ -236,7 +236,7 @@ namespace BookReaderAPI.Controllers
                 // generate token
                 string userId = userObj.id.ToString();
                 var token = GenerateToken(userId, username, userObj.first_name, userObj.last_name);
-                var result = GetAPIResult(data: token);
+                var result = GetAPIResult(token);
 
                 return Ok(result);
             }

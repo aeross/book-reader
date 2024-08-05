@@ -17,7 +17,7 @@ namespace BookReaderAPI.Controllers
             try
             {
                 var data = _context.Get<Chapter>();
-                var result = GetAPIResult(data: data);
+                var result = GetAPIResult(data);
                 return Ok(result);
             }
             catch (Exception e)
@@ -34,7 +34,7 @@ namespace BookReaderAPI.Controllers
                 var data = _context.GetById<Chapter>(id);
                 if (!data.Any()) throw new NotFoundException("Data not found");
 
-                var result = GetAPIResult(data: data);
+                var result = GetAPIResult(data);
                 return Ok(result);
             }
             catch (Exception e)
@@ -55,7 +55,7 @@ namespace BookReaderAPI.Controllers
 
                 var data = _context.Insert<Chapter>(body);
 
-                var result = GetAPIResult(201, data);
+                var result = GetAPIResult(data, 201);
                 return Created(string.Empty, result);
             }
             catch (Exception e)
@@ -78,7 +78,7 @@ namespace BookReaderAPI.Controllers
 
                 var data = _context.Delete<Chapter>(id);
 
-                var result = GetAPIResult(data: data);
+                var result = GetAPIResult(data);
                 return Ok(result);
             }
             catch (Exception e)
@@ -115,7 +115,7 @@ namespace BookReaderAPI.Controllers
                     });
                 }
 
-                var result = GetAPIResult(data: chapters);
+                var result = GetAPIResult(chapters);
                 return Ok(result);
             }
             catch (Exception e)
@@ -140,7 +140,7 @@ namespace BookReaderAPI.Controllers
                 body = Chapter.Validate(body);
                 var data = _context.Update<Chapter>(id, body);
 
-                var result = GetAPIResult(data: data);
+                var result = GetAPIResult(data);
                 return Ok(result);
             }
             catch (Exception e)
@@ -164,7 +164,7 @@ namespace BookReaderAPI.Controllers
                 body = Chapter.Validate(body);
                 var data = _context.Update<Chapter>(id, body);
 
-                var result = GetAPIResult(data: data);
+                var result = GetAPIResult(data);
                 return Ok(result);
             }
             catch (Exception e)

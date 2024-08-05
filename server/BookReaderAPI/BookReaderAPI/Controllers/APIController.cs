@@ -26,16 +26,16 @@ namespace BookReaderAPI.Controllers
             if (errorType.IsSubclassOf(typeof(APIException)))
             {
                 var code = ((APIException)e).ErrorCode;
-                return StatusCode(code, GetAPIResult(code, e.Message));
+                return StatusCode(code, GetAPIResult(e.Message, code));
             }
             else
             {
-                return StatusCode(500, GetAPIResult(500, e.Message + " Stack Trace " + e.StackTrace));
+                return StatusCode(500, GetAPIResult(e.Message + " Stack Trace " + e.StackTrace, 500));
             }
         }
 
         [NonAction]
-        protected APIResult GetAPIResult(int code = 200, dynamic? data = null)
+        protected APIResult GetAPIResult(dynamic? data = null, int code = 200)
         {
             string message = code switch
             {

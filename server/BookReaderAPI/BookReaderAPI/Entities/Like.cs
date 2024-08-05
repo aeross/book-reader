@@ -10,6 +10,7 @@ namespace BookReaderAPI.Entities
         public int BookId { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+
         static string IEntity.GetQuery()
         {
             return "SELECT * FROM public.likes";
@@ -69,7 +70,7 @@ namespace BookReaderAPI.Entities
         public static string CountAllUsersWhoLikesABook()
         {
             return @"
-            SELECT COUNT(*) as likes FROM public.books
+            SELECT COUNT(*) as likes_count FROM public.books
                 INNER JOIN public.likes ON books.id = likes.book_id
                 INNER JOIN public.users ON users.id = likes.user_id
             WHERE books.id = @BookId;
@@ -95,7 +96,7 @@ namespace BookReaderAPI.Entities
         public static string CountAllLikedBooksByUser()
         {
             return @"
-            SELECT COUNT(*) as likes FROM public.books
+            SELECT COUNT(*) as likes_count FROM public.books
                 INNER JOIN public.likes ON books.id = likes.book_id
                 INNER JOIN public.users ON users.id = likes.user_id
             WHERE users.username = @Username;
