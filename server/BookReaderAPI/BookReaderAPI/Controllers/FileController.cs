@@ -61,7 +61,7 @@ namespace BookReaderAPI.Controllers
                     ProfilePicFileId = userData.profile_pic_file_id
                 };
 
-                if (user.ProfilePicFileId == null)
+                if (user.ProfilePicFileId == null || user.ProfilePicFileId == 0)
                 {
                     var file = _context.Insert(new Entities.File { Base64 = base64 });
                     var fileId = (file.First() as Entities.File)!.Id;
@@ -98,7 +98,7 @@ namespace BookReaderAPI.Controllers
                 string base64 = fReq.Base64 ?? "";
                 if (string.IsNullOrEmpty(base64)) throw new BadRequestException("Base64 is required");
 
-                if (book!.CoverImgFileId == null)
+                if (book!.CoverImgFileId == null || book!.CoverImgFileId == 0)
                 {
                     var file = _context.Insert(new Entities.File { Base64 = base64 });
                     var fileId = (file.First() as Entities.File)!.Id;
