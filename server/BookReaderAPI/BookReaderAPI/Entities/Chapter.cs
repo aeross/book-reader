@@ -38,7 +38,7 @@ namespace BookReaderAPI.Entities
             )
             VALUES (
                 @Title, @Content, @NumOfWords, 
-                @Status, @BookId, (SELECT MAX(ordering)+1 FROM public.chapters WHERE book_id = @BookId), 
+                @Status, @BookId, (SELECT COALESCE(MAX(ordering)+1, 1) FROM public.chapters WHERE book_id = @BookId), 
                 @Type, now(), now()
             )
             RETURNING *;
