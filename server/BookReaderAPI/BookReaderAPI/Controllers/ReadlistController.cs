@@ -27,47 +27,48 @@ namespace BookReaderAPI.Controllers
                     Readlist.GetReadlists(),
                     new DbParams { Name = "Username", Value = User.Identity!.Name, Type = "string" }
                 );
-                if (!data.Any()) return Ok(GetAPIResult(data));
 
-                // TODO: return all readlists instead of just the first
-                var readlist = data.First();
-
-                // get booklist
-                data = _context.ExecQuery(
-                    Readlist.GetAllBooksInAReadlist(),
-                    new DbParams { Name = "ReadlistId", Value = readlist.id, Type = "int" }
-                );
-
-                // convert to DTO
-                List<Book> books = [];
-                foreach (var book in data)
+                List<ReadlistDTO> output = [];
+                foreach (var readlist in data)
                 {
-                    books.Add(new Book
+                    // get booklist
+                    data = _context.ExecQuery(
+                        Readlist.GetAllBooksInAReadlist(),
+                        new DbParams { Name = "ReadlistId", Value = readlist.id, Type = "int" }
+                    );
+
+                    // convert to DTO
+                    List<Book> books = [];
+                    foreach (var book in data)
                     {
-                        Id = book.id,
-                        Genre = book.genre,
-                        Title = book.title,
-                        Tagline = book.tagline,
-                        Description = book.description,
-                        CoverImgFileId = book.cover_img_file_id,
-                        Views = book.views,
-                        CreatedAt = book.created_at,
-                        UpdatedAt = book.updated_at,
-                    });
+                        books.Add(new Book
+                        {
+                            Id = book.id,
+                            Genre = book.genre,
+                            Title = book.title,
+                            Tagline = book.tagline,
+                            Description = book.description,
+                            CoverImgFileId = book.cover_img_file_id,
+                            Views = book.views,
+                            CreatedAt = book.created_at,
+                            UpdatedAt = book.updated_at,
+                        });
+                    }
+
+                    var readlistDTO = new ReadlistDTO
+                    {
+                        Id = readlist.id,
+                        UserId = readlist.user_id,
+                        Title = readlist.title,
+                        Description = readlist.description,
+                        CreatedAt = readlist.created_at,
+                        UpdatedAt = readlist.updated_at,
+                        Books = books
+                    };
+                    output.Add(readlistDTO);
                 }
 
-                var readlistDTO = new ReadlistDTO
-                {
-                    Id = readlist.id,
-                    UserId = readlist.user_id,
-                    Title = readlist.title,
-                    Description = readlist.description,
-                    CreatedAt = readlist.created_at,
-                    UpdatedAt = readlist.updated_at,
-                    Books = books
-                };
-
-                var result = GetAPIResult(readlistDTO);
+                var result = GetAPIResult(output);
                 return Ok(result);
             }
             catch (Exception e)
@@ -85,47 +86,48 @@ namespace BookReaderAPI.Controllers
                     Readlist.GetReadlists(),
                     new DbParams { Name = "Username", Value = username }
                 );
-                if (!data.Any()) return Ok(GetAPIResult(data));
 
-                // TODO: return all readlists instead of just the first
-                var readlist = data.First();
-
-                // get booklist
-                data = _context.ExecQuery(
-                    Readlist.GetAllBooksInAReadlist(),
-                    new DbParams { Name = "ReadlistId", Value = readlist.id, Type = "int" }
-                );
-
-                // convert to DTO
-                List<Book> books = [];
-                foreach (var book in data)
+                List<ReadlistDTO> output = [];
+                foreach (var readlist in data)
                 {
-                    books.Add(new Book
+                    // get booklist
+                    data = _context.ExecQuery(
+                        Readlist.GetAllBooksInAReadlist(),
+                        new DbParams { Name = "ReadlistId", Value = readlist.id, Type = "int" }
+                    );
+
+                    // convert to DTO
+                    List<Book> books = [];
+                    foreach (var book in data)
                     {
-                        Id = book.id,
-                        Genre = book.genre,
-                        Title = book.title,
-                        Tagline = book.tagline,
-                        Description = book.description,
-                        CoverImgFileId = book.cover_img_file_id,
-                        Views = book.views,
-                        CreatedAt = book.created_at,
-                        UpdatedAt = book.updated_at,
-                    });
+                        books.Add(new Book
+                        {
+                            Id = book.id,
+                            Genre = book.genre,
+                            Title = book.title,
+                            Tagline = book.tagline,
+                            Description = book.description,
+                            CoverImgFileId = book.cover_img_file_id,
+                            Views = book.views,
+                            CreatedAt = book.created_at,
+                            UpdatedAt = book.updated_at,
+                        });
+                    }
+
+                    var readlistDTO = new ReadlistDTO
+                    {
+                        Id = readlist.id,
+                        UserId = readlist.user_id,
+                        Title = readlist.title,
+                        Description = readlist.description,
+                        CreatedAt = readlist.created_at,
+                        UpdatedAt = readlist.updated_at,
+                        Books = books
+                    };
+                    output.Add(readlistDTO);
                 }
 
-                var readlistDTO = new ReadlistDTO
-                {
-                    Id = readlist.id,
-                    UserId = readlist.user_id,
-                    Title = readlist.title,
-                    Description = readlist.description,
-                    CreatedAt = readlist.created_at,
-                    UpdatedAt = readlist.updated_at,
-                    Books = books
-                };
-
-                var result = GetAPIResult(readlistDTO);
+                var result = GetAPIResult(output);
                 return Ok(result);
             }
             catch (Exception e)
