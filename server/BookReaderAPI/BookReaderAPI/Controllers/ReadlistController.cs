@@ -29,6 +29,7 @@ namespace BookReaderAPI.Controllers
                 );
                 if (!data.Any()) return Ok(GetAPIResult(data));
 
+                // TODO: return all readlists instead of just the first
                 var readlist = data.First();
 
                 // get booklist
@@ -84,7 +85,9 @@ namespace BookReaderAPI.Controllers
                     Readlist.GetReadlists(),
                     new DbParams { Name = "Username", Value = username }
                 );
+                if (!data.Any()) return Ok(GetAPIResult(data));
 
+                // TODO: return all readlists instead of just the first
                 var readlist = data.First();
 
                 // get booklist

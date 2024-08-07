@@ -63,6 +63,19 @@ namespace BookReaderAPI.Entities
             return "SELECT * FROM public.users WHERE username = @Username";
         }
 
+        /// <summary>
+        /// params: @UserId int
+        /// </summary>
+        public static string GetAuthoredBooks()
+        {
+            return @"
+            SELECT books.* FROM public.books 
+                INNER JOIN public.authors ON books.id = authors.book_id
+                INNER JOIN public.users ON authors.user_id = users.id
+            WHERE users.username = @Username;
+            ";
+        }
+
         static dynamic IEntity.Create(IDataRecord record)
         {
             User b = new User

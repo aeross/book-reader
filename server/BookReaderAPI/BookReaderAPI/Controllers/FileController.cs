@@ -105,6 +105,7 @@ namespace BookReaderAPI.Controllers
 
                     _context.ExecQuery(
                         Book.UpdateFile(), 
+                        new DbParams { Name = "id", Value = book.Id },
                         new DbParams { Name = "CoverImgFileId", Value = fileId });
                 }
                 else
@@ -187,6 +188,7 @@ namespace BookReaderAPI.Controllers
                     // delete from books first, bcs of FK constraint
                     _context.ExecQuery(
                         Book.UpdateFile(),
+                        new DbParams { Name = "id", Value = book.Id },
                         new DbParams { Name = "CoverImgFileId", Value = null }
                     );
 
