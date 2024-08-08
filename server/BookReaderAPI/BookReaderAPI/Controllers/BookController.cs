@@ -102,9 +102,36 @@ namespace BookReaderAPI.Controllers
             try
             {
                 int userId = Authenticate();
-                AuthorizeBookAuthor(userId, id);
+                Book bookToBeDeleted = AuthorizeBookAuthor(userId, id);
 
+                // delete from authors
+                _context.ExecQuery(
+                    "DELETE FROM public.authors WHERE book_id = @id;",
+                    new DbParams { Name = "id", Value = id }
+                );
+
+                // delete from likes
+                _context.ExecQuery(
+                    "DELETE FROM public.likes WHERE book_id = @id;",
+                    new DbParams { Name = "id", Value = id }
+                );
+
+                // delete from booklists
+                _context.ExecQuery(
+                    "DELETE FROM public.booklists WHERE book_id = @id;",
+                    new DbParams { Name = "id", Value = id }
+                );
+
+                // delete from books
                 var data = _context.Delete<Book>(id);
+
+                // delete from files
+                if (!(bookToBeDeleted!.CoverImgFileId == null || bookToBeDeleted!.CoverImgFileId == 0))
+                {
+                    int fileId = bookToBeDeleted.CoverImgFileId ?? default;
+                    _context.Delete<Entities.File>(fileId);
+                }
+
 
                 var result = GetAPIResult(data);
                 return Ok(result);
@@ -116,7 +143,7 @@ namespace BookReaderAPI.Controllers
         }
 
 
-        [HttpGet("author/{bookId}")]
+        [HttpGet("get-authors/{bookId}")]
         public IActionResult GetBookAuthors(int bookId)
         {
             try

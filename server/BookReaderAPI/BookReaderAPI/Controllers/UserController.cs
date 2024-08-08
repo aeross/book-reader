@@ -2,6 +2,7 @@ using BookReaderAPI.Data;
 using BookReaderAPI.DTOs;
 using BookReaderAPI.Entities;
 using BookReaderAPI.Exceptions;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -19,6 +20,49 @@ namespace BookReaderAPI.Controllers
         public UserController(IConfiguration config) : base(config) 
         {
             _config = config;
+        }
+
+        // get all books authored by user
+        [HttpGet("{username}/books")]
+        public IActionResult GetBookAuthors(string username)
+        {
+            try
+            {
+                var books = _context.ExecQuery(
+                    Entities.User.GetAuthoredBooks(),
+                    new DbParams { Name = "Username", Value = username });
+
+                //// serialize to User objects
+                List<BookDTO> booksDTO = new();
+                foreach (var book in books)
+                {
+                    var likes = _context.ExecQuery(
+                        Like.CountAllUsersWhoLikesABook(),
+                        new DbParams { Name = "BookId", Value = book.id });
+                    Int64 likesCount = likes.First().likes_count;
+
+                    booksDTO.Add(new BookDTO
+                    {
+                        Id = book.id,
+                        Title = book.title,
+                        Tagline = book.tagline,
+                        Description = book.description,
+                        Genre = book.genre,
+                        CoverImgFileId = book.cover_img_file_id,
+                        Views = book.views,
+                        Likes = likesCount,
+                        //Comments = book.comments,
+                        CreatedAt = book.created_at,
+                        UpdatedAt = book.updated_at
+                    });
+                }
+
+                return Ok(GetAPIResult(booksDTO));
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
         }
 
         // get all liked books by user
