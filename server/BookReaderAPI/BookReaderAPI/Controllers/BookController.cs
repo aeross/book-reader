@@ -4,6 +4,7 @@ using BookReaderAPI.Entities;
 using BookReaderAPI.Exceptions;
 using BookReaderAPI.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 using System.Net;
 using System.Security.Claims;
 
@@ -14,12 +15,65 @@ namespace BookReaderAPI.Controllers
         public BookController(IConfiguration config) : base(config) { }
 
         [HttpGet]
-        public IActionResult Get()
+        public IActionResult Get([FromQuery] string search = "")
         {
             try
             {
-                var data = _context.Get<Book>();
-                var result = GetAPIResult(data);
+                // in this case, we need to generate queries on the fly :)
+                string query = "SELECT * FROM public.books";
+
+                if (!string.IsNullOrEmpty(search))
+                {
+                    query += " WHERE";
+                }
+
+                if (!string.IsNullOrWhiteSpace(search))
+                {
+                    search = "%" + search + "%";
+                    // title takes the 1st priority, tagline 2nd, description 3rd.
+                    query += @" books.title ILIKE @Search
+                        OR books.tagline ILIKE @Search
+                        OR books.description ILIKE @Search
+                        ORDER BY
+                            CASE
+                                WHEN books.title ILIKE @Search THEN 1
+                                WHEN books.tagline ILIKE @Search THEN 2
+                                ELSE 3
+                            END";
+                }
+
+                // execute query
+                query += ";";
+                //Console.WriteLine(query);
+                var data = _context.ExecQuery(query, 
+                    new DbParams { Name = "Search", Value = search });
+                
+                List<BookDTO> booksDTO = [];
+
+                foreach (var book in data)
+                {
+                    var likes = _context.ExecQuery(
+                    Like.CountAllUsersWhoLikesABook(),
+                    new DbParams { Name = "BookId", Value = book.id }
+                    );
+                    Int64 likesCount = likes.First().likes_count;
+
+                    booksDTO.Add(new BookDTO
+                    {
+                        Id = book.id,
+                        Genre = book.genre,
+                        Title = book.title,
+                        Tagline = book.tagline,
+                        Description = book.description,
+                        Views = book.views,
+                        Likes = likesCount,
+                        CoverImgFileId = book.cover_img_file_id,
+                        CreatedAt = book.created_at,
+                        UpdatedAt = book.updated_at,
+                    });
+                }
+
+                var result = GetAPIResult(booksDTO);
                 return Ok(result);
             }
             catch (Exception e)
@@ -46,6 +100,21 @@ namespace BookReaderAPI.Controllers
                 BookDTO bookDTO = book.ToDTO(likesCount);
 
                 var result = GetAPIResult(bookDTO);
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+
+        [HttpGet("random")]
+        public IActionResult GetRandom()
+        {
+            try
+            {
+                var data = _context.Get<Book>();
+                var result = GetAPIResult(data);
                 return Ok(result);
             }
             catch (Exception e)

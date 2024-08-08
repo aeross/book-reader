@@ -17,7 +17,7 @@ namespace BookReaderAPI.Entities
 
         static string IEntity.GetQuery()
         {
-            return "SELECT * FROM public.books";
+            return "SELECT * FROM public.books ORDER BY RANDOM() LIMIT 10";
         }
 
         static string IEntity.GetByIdQuery()
