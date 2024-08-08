@@ -2,6 +2,7 @@
 using BookReaderAPI.Entities;
 using BookReaderAPI.Exceptions;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 using System.Security.Claims;
 
 namespace BookReaderAPI.Controllers
@@ -95,6 +96,26 @@ namespace BookReaderAPI.Controllers
             }
 
             return book.First();
+        }
+
+        [NonAction]
+        protected Readlist AuthorizeReadlistOwner(int userId, int readlistId)
+        {
+            var readlist = _context.GetById<Readlist>(readlistId);
+            if (!readlist.Any()) throw new NotFoundException("Readlist not found");
+
+            var ownsReadlist = _context.ExecQuery(
+                Readlist.CheckReadlistOwnedByUser(),
+                new DbParams { Name = "ReadlistId", Value = readlistId },
+                new DbParams { Name = "UserId", Value = userId }
+            );
+
+            if (!ownsReadlist.Any())
+            {
+                throw new ForbiddenException("You have no access");
+            }
+
+            return readlist.First();
         }
     }
 }
