@@ -161,6 +161,12 @@ namespace BookReaderAPI.Controllers
                 var checkBook = _context.GetById<Book>(body.BookId);
                 if (!checkBook.Any()) throw new NotFoundException("Book not found");
 
+                var book = _context.ExecQuery(
+                    Booklist.CheckBookInReadlist(),
+                    new DbParams { Name = "ReadlistId", Value = body.ReadlistId },
+                    new DbParams { Name = "BookId", Value = body.BookId }
+                );
+                if (book.Any()) throw new BadRequestException("Book already exists in this readlist");
                 _context.Insert(body);
 
                 return Ok(GetAPIResult("Book added"));
@@ -179,11 +185,12 @@ namespace BookReaderAPI.Controllers
                 int userId = Authenticate();
                 AuthorizeReadlistOwner(userId, body.ReadlistId);
 
-                _context.ExecQuery(
+                var deletedBook = _context.ExecQuery(
                     Booklist.DeleteBookFromReadlist(), 
                     new DbParams { Name = "ReadlistId", Value = body.ReadlistId },
                     new DbParams { Name = "BookId", Value = body.BookId }
                 );
+                if (!deletedBook.Any()) throw new BadRequestException("Book not found in readlist");
 
                 return Ok(GetAPIResult("Book deleted"));
             }

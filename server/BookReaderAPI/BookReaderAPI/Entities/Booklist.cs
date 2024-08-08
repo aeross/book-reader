@@ -45,6 +45,16 @@ namespace BookReaderAPI.Entities
         }
 
         // non-standard crud queries
+        /// <summary>
+        /// params: @ReadlistId int, @BookId int
+        /// </summary>
+        public static string CheckBookInReadlist()
+        {
+            return @"
+                SELECT * FROM public.booklists 
+                WHERE readlist_id = @ReadlistId AND book_id = @BookId;
+                ";
+        }
 
         /// <summary>
         /// params: @ReadlistId int, @BookId int
@@ -53,7 +63,8 @@ namespace BookReaderAPI.Entities
         {
             return @"
                 DELETE FROM public.booklists
-                WHERE readlist_id = @ReadlistId AND book_id = @BookId;
+                WHERE readlist_id = @ReadlistId AND book_id = @BookId
+                RETURNING *;
                 ";
         }
 
