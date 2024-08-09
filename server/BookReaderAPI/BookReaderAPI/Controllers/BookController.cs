@@ -15,49 +15,22 @@ namespace BookReaderAPI.Controllers
         public BookController(IConfiguration config) : base(config) { }
 
         [HttpGet]
-        public IActionResult Get([FromQuery] string search = "")
+        public IActionResult Get([FromQuery] string search = "", string sort = "", string filter = "",
+            int page = 1, int limit = 5)
         {
             try
             {
-                // in this case, we need to generate queries on the fly :)
-                string query = "SELECT * FROM public.books";
-
-                if (!string.IsNullOrEmpty(search))
-                {
-                    query += " WHERE";
-                }
-
-                if (!string.IsNullOrWhiteSpace(search))
-                {
-                    search = "%" + search + "%";
-                    // title takes the 1st priority, tagline 2nd, description 3rd.
-                    query += @" books.title ILIKE @Search
-                        OR books.tagline ILIKE @Search
-                        OR books.description ILIKE @Search
-                        ORDER BY
-                            CASE
-                                WHEN books.title ILIKE @Search THEN 1
-                                WHEN books.tagline ILIKE @Search THEN 2
-                                ELSE 3
-                            END";
-                }
-
+                string query = Book.GetWithFilterQuery(ref search, sort, filter, page, limit);
                 // execute query
-                query += ";";
                 //Console.WriteLine(query);
-                var data = _context.ExecQuery(query, 
-                    new DbParams { Name = "Search", Value = search });
-                
+                var data = _context.ExecQuery(query,
+                    new DbParams { Name = "Search", Value = search },
+                    new DbParams { Name = "Filter", Value = filter });
+
                 List<BookDTO> booksDTO = [];
 
                 foreach (var book in data)
                 {
-                    var likes = _context.ExecQuery(
-                    Like.CountAllUsersWhoLikesABook(),
-                    new DbParams { Name = "BookId", Value = book.id }
-                    );
-                    Int64 likesCount = likes.First().likes_count;
-
                     booksDTO.Add(new BookDTO
                     {
                         Id = book.id,
@@ -66,7 +39,7 @@ namespace BookReaderAPI.Controllers
                         Tagline = book.tagline,
                         Description = book.description,
                         Views = book.views,
-                        Likes = likesCount,
+                        Likes = book.likes_count,
                         CoverImgFileId = book.cover_img_file_id,
                         CreatedAt = book.created_at,
                         UpdatedAt = book.updated_at,

@@ -1,4 +1,5 @@
 ﻿using BookReaderAPI.Data;
+using BookReaderAPI.Exceptions;
 using System.Data;
 
 namespace BookReaderAPI.Entities
@@ -121,6 +122,58 @@ namespace BookReaderAPI.Entities
             ";
         }
 
+        /// <summary>
+        /// params: @Search string, @Filter string
+        /// </summary>
+        /// <param name="search">the search term.</param>
+        /// <param name="sort">can be sorted by "title-asc", "title-desc", "likes", and "views".</param>
+        /// <param name="filter">can be filtered by genre.</param>
+        /// <param name="page">the page number.</param>
+        /// <param name="limit">number of books per page.</param>
+        public static string GetWithFilterQuery(ref string search, string sort, string filter, int page, int limit)
+        {
+            // in this case, we need to generate queries on the fly :)
+            string query = @"SELECT COUNT(likes.id) AS likes_count, books.* FROM public.books
+                    FULL OUTER JOIN public.likes ON books.id = likes.book_id
+                    FULL OUTER JOIN public.users ON users.id = likes.user_id";
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                if (!string.IsNullOrWhiteSpace(sort))
+                    throw new BadRequestException("Can't search and sort at the same time");
+
+                search = "%" + search + "%";
+                // title takes the 1st priority, tagline 2nd, description 3rd.
+                query += @" WHERE books.title ILIKE @Search
+                        OR books.tagline ILIKE @Search
+                        OR books.description ILIKE @Search
+                        GROUP BY books.id
+                        ORDER BY
+                            CASE
+                                WHEN books.title ILIKE @Search THEN 1
+                                WHEN books.tagline ILIKE @Search THEN 2
+                                ELSE 3
+                            END";
+            }
+
+            string sortQuery = sort switch
+            {
+                "title-asc" => " GROUP BY books.id ORDER BY books.title ASC",
+                "title-desc" => " GROUP BY books.id ORDER BY books.title DESC",
+                "views" => " GROUP BY books.id ORDER BY books.views DESC",
+                "likes" => " GROUP BY books.id ORDER BY COUNT(likes.id) DESC",
+                _ => string.Empty
+            };
+            query += sortQuery;
+
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                query = "SELECT * FROM (" + query + ") WHERE GENRE ILIKE @Filter";
+            }
+
+            query += $" LIMIT {limit} OFFSET {(page - 1) * limit};";
+            return query;
+        }
 
         static dynamic IEntity.Create(IDataRecord record)
         {
