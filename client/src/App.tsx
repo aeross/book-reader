@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Book } from './types/book';
+
 
 function App() {
-  const [books, setBooks] = useState<any>([]);
+  const [books, setBooks] = useState<Book[]>([]);
   useEffect(() => {
     async function fetchBooksRandom() {
       try {
@@ -22,27 +21,16 @@ function App() {
 
   return (
     <>
+      <h1 className="text-3xl font-bold underline">Books</h1>
       <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Books!</h1>
-      <div className="card">
         <ul>
           {
-            books.map((book: any) => {
-              return <li key={book.id}>{book.title}</li>
+            books.map((book) => {
+              return <li key={book.id}>{book.title} ({book.genre})</li>
             })
           }
         </ul>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }
