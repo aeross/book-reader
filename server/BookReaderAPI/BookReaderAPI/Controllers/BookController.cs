@@ -22,7 +22,7 @@ namespace BookReaderAPI.Controllers
             {
                 string query = Book.GetWithFilterQuery(ref search, sort, filter, page, limit);
                 // execute query
-                //Console.WriteLine(query);
+                Console.WriteLine(query);
                 var data = _context.ExecQuery(query,
                     new DbParams { Name = "Search", Value = search },
                     new DbParams { Name = "Filter", Value = filter });
