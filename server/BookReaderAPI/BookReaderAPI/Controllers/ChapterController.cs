@@ -148,29 +148,5 @@ namespace BookReaderAPI.Controllers
                 return HandleException(e);
             }
         }
-
-        [HttpPatch("save-draft/{id}")]
-        public IActionResult SaveDraft(int id, [FromBody] Chapter body)
-        {
-            try
-            {
-                int userId = Authenticate();
-
-                var ch = _context.GetById<Chapter>(id);
-                if (!ch.Any()) throw new NotFoundException("Data not found");
-
-                AuthorizeBookAuthor(userId, ch.First().BookId);
-
-                body = Chapter.Validate(body);
-                var data = _context.Update<Chapter>(id, body);
-
-                var result = GetAPIResult(data);
-                return Ok(result);
-            }
-            catch (Exception e)
-            {
-                return HandleException(e);
-            }
-        }
     }
 }
