@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Book } from './types/book';
+import { Book } from './API/types';
+import agent from './API/requests';
 
 
 function App() {
@@ -7,11 +8,8 @@ function App() {
   useEffect(() => {
     async function fetchBooksRandom() {
       try {
-        const data = await fetch("http://localhost:5030/book/random");
-        if (data.ok) {
-          const jsonData = await data.json();
-          setBooks(jsonData.data);
-        }
+        const res = await agent.get("book/random");
+        setBooks(res.data.data);
       } catch (error) {
         console.log(error);
       }
