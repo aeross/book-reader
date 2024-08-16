@@ -42,3 +42,9 @@ export type User = {
     createdAt: Date;
     updatedAt: Date;
 }
+
+export type APIResponse<T> = {
+    statusCode: number;
+    message: string;
+    data?: T;
+}
