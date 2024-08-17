@@ -3,9 +3,13 @@ import { Link, useNavigate } from "react-router-dom"
 import agent from "../API/axios";
 import { APIResponse } from "../API/types";
 import { AxiosError } from "axios";
+import { useAppDispatch } from "../store/configureStore";
+import { setUser } from "../store/userSlice";
 
 function Login() {
     const navigate = useNavigate();
+
+    const dispatch = useAppDispatch();
 
     const [error400, setError400] = useState({
         status: false,
@@ -24,6 +28,7 @@ function Login() {
             const token = res.data.data;
             if (token) {
                 localStorage.setItem("token", token);
+                dispatch(setUser({ userLoaded: false }));
                 navigate("/");
             }
         } catch (error) {

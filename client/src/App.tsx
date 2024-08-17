@@ -3,10 +3,11 @@ import { Outlet } from 'react-router-dom';
 import agent from './API/axios';
 import { APIResponse, User } from './API/types';
 import Nav from './components/Nav';
-import { useAppDispatch } from './store/configureStore';
+import { useAppDispatch, useAppSelector } from './store/configureStore';
 import { setUser } from './store/userSlice';
 
 function App() {
+    const { userLoaded } = useAppSelector(state => state.user);
     const dispatch = useAppDispatch();
 
     async function fetchCurrentUser() {
@@ -15,15 +16,16 @@ function App() {
                 headers: { Authorization: "Bearer " + localStorage.getItem("token") }
             });
             const data = res.data.data;
-            dispatch(setUser(data));
+            dispatch(setUser({ user: data, userLoaded: true }));
         } catch (error) {
             console.log(error);
+            dispatch(setUser({ user: null, userLoaded: true }));
         }
     }
 
     useEffect(() => {
-        fetchCurrentUser();
-    }, [dispatch])
+        if (!userLoaded) fetchCurrentUser();
+    }, [userLoaded, dispatch])
 
     return (
         <>

@@ -2,10 +2,12 @@ import { createSlice } from "@reduxjs/toolkit";
 import { User } from "../API/types";
 
 export interface UserSlice {
+    userLoaded: boolean;
     user: User | null;
 }
 
 const initialState: UserSlice = {
+    userLoaded: false,
     user: null
 }
 
@@ -15,7 +17,8 @@ export const userSlice = createSlice({
     initialState,
     reducers: {
         setUser: (state, action) => {
-            state.user = action.payload
+            state.user = action.payload.user;
+            state.userLoaded = action.payload.userLoaded;
         }
     }
 });
