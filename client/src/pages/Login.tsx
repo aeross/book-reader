@@ -1,10 +1,12 @@
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import agent from "../API/axios";
 import { APIResponse } from "../API/types";
 import { AxiosError } from "axios";
 
 function Login() {
+    const navigate = useNavigate();
+
     const [error400, setError400] = useState({
         status: false,
         message: ""
@@ -20,8 +22,10 @@ function Login() {
             const res = await agent.post<APIResponse<string>>("user/login", { username, password });
 
             const token = res.data.data;
-            console.log(token);
-
+            if (token) {
+                localStorage.setItem("token", token);
+                navigate("/");
+            }
         } catch (error) {
             console.log(error);
 
@@ -51,7 +55,7 @@ function Login() {
 
                 {error400.status && <p className="text-red-600">{error400.message}</p>}
 
-                <div className="m-4 px-6 grid grid-cols-4 gap-2">
+                <div className="m-4 px-6 grid grid-cols-4 gap-4">
                     <label htmlFor="Username">Username</label>
                     <input
                         type="text"

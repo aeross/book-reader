@@ -1,51 +1,56 @@
 import { useEffect, useState } from 'react'
-import { Book } from '../API/types';
+import { APIResponse, Book } from '../API/types';
 import agent from '../API/axios';
 import Card from '../components/Card';
-import { useAppDispatch, useAppSelector } from '../store/configureStore';
-import { decrement, increment } from '../store/counterSlice';
-
 
 function Home() {
-  const dispatch = useAppDispatch();
-  const { data, title } = useAppSelector(state => state.counter);
 
   const [books, setBooks] = useState<Book[]>([]);
 
-  useEffect(() => {
-    async function fetchBooksRandom() {
-      try {
-        const res = await agent.get("book/random");
-        setBooks(res.data.data);
-      } catch (error) {
-        console.log(error);
-      }
+  async function fetchBooksRandom() {
+    try {
+      const res = await agent.get<APIResponse<Book[]>>("book/random");
+      const data = res.data.data;
+      if (data) setBooks(data);
+    } catch (error) {
+      console.log(error);
     }
+  }
+
+  useEffect(() => {
     fetchBooksRandom();
   }, []);
 
   return (
     <>
-      <h1 className="text-3xl font-bold underline">Books</h1>
-      <div>
-        <ul>
+
+      <div className="outer container">
+        <h2 className="text-3xl font-bold mb-4 mt-6">Your books</h2>
+        <div className="grid grid-cols-5 gap-2">
           {
-            books.map((book) => {
-              return <li key={book.id}>{book.title} ({book.genre})</li>
+            books.map(book => {
+              return <Card key={book.id} book={book} />
             })
           }
-        </ul>
-      </div>
+        </div>
 
-      <Card></Card>
+        <h2 className="text-3xl font-bold mb-4 mt-6">Your readlists</h2>
+        <div className="grid grid-cols-5 gap-2">
+          {
+            books.map(book => {
+              return <Card key={book.id} book={book} />
+            })
+          }
+        </div>
 
-      <h3>{title}</h3>
-      <div>Count: {data}</div>
-      <div className="flex gap-4">
-        <button onClick={() => dispatch(increment(1))}>{"+"}</button>
-        <button onClick={() => dispatch(decrement(1))}>{"-"}</button>
-        <button onClick={() => dispatch(increment(5))}>{"+5"}</button>
-        <button onClick={() => dispatch(decrement(5))}>{"-5"}</button>
+        <h2 className="text-3xl font-bold mb-4 mt-6">Random books picked for you</h2>
+        <div className="grid grid-cols-5 gap-2">
+          {
+            books.map(book => {
+              return <Card key={book.id} book={book} />
+            })
+          }
+        </div>
       </div>
     </>
   )

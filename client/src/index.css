@@ -1,3 +1,42 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.outer {
+    padding: 1rem 2rem;
+}
+
+.text-yellow-525 {
+    --tw-text-opacity: 1;
+    color: rgb(225 171 7 / var(--tw-text-opacity))
+        /* #eab308 */
+    ;
+}
+
+.text-yellow-550 {
+    --tw-text-opacity: 1;
+    color: rgb(217 160 7 / var(--tw-text-opacity))
+        /* #eab308 */
+    ;
+}
+
+.text-yellow-575 {
+    --tw-text-opacity: 1;
+    color: rgb(206 148 6 / var(--tw-text-opacity))
+        /* #ca8a04 */
+    ;
+}
+
+.text-yellow-625 {
+    --tw-text-opacity: 1;
+    color: rgb(191 124 6 / var(--tw-text-opacity))
+        /* #ca8a04 */
+    ;
+}
+
+.text-yellow-650 {
+    --tw-text-opacity: 1;
+    color: rgb(180 118 5 / var(--tw-text-opacity))
+        /* #ca8a04 */
+    ;
+}
