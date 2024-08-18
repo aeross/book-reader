@@ -4,6 +4,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { Link, useNavigate } from "react-router-dom"
 import { useAppDispatch, useAppSelector } from "../store/configureStore";
 import { setUser } from "../store/userSlice";
+import { useState } from "react";
+import Drawer from "./Drawer";
 
 
 function Nav() {
@@ -17,11 +19,21 @@ function Nav() {
         dispatch(setUser({ userLoaded: false }));
     }
 
+    // drawer
+    const [isOpen, setIsOpen] = useState(false);
+
+
     return (
         <>
-            <nav className="sticky top-0 z-10 p-3 bg-orange-50 shadow grid grid-cols-5">
+            <nav className="sticky top-0 z-10 p-3 pt-4 bg-orange-50 shadow grid grid-cols-5">
                 <div className="flex justify-start gap-6 px-5 pb-2 col-span-2">
-                    <button className="flex items-center"><FontAwesomeIcon icon={faBars} className="text-3xl opacity-65" /></button>
+
+                    <button className="flex items-center pt-[3px]" onClick={() => setIsOpen(true)}>
+                        <FontAwesomeIcon icon={faBars} className="text-3xl opacity-65" />
+                    </button>
+
+                    <Drawer isOpen={isOpen} setIsOpen={setIsOpen} />
+
                     <div>
                         <div className="text-4xl font-bold flex items-center hover:cursor-pointer" onClick={() => { navigate("/") }}>
                             <span className="text-yellow-500">B</span>
