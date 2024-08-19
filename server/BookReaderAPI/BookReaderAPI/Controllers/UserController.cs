@@ -187,7 +187,7 @@ namespace BookReaderAPI.Controllers
                     Username = userData.username,
                     FirstName = userData.first_name,
                     LastName = userData.last_name,
-                    ProfilePicFileId = userData.profile_pic_file_id,
+                    ProfilePicBase64 = userData.base64,
                     CreatedAt = userData.created_at,
                     UpdatedAt = userData.updated_at
                 };
@@ -229,7 +229,6 @@ namespace BookReaderAPI.Controllers
                     Username = user.Username,
                     FirstName = user.FirstName,
                     LastName = user.LastName,
-                    ProfilePicFileId = user.ProfilePicFileId,
                     CreatedAt = user.CreatedAt,
                     UpdatedAt = user.UpdatedAt
                 };

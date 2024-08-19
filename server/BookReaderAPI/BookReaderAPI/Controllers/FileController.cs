@@ -39,14 +39,20 @@ namespace BookReaderAPI.Controllers
         /// Uploads profile pic file for the User entity.
         /// </summary>
         [HttpPost("user")]
-        public IActionResult UploadsUser([FromBody] Entities.File fReq)
+        public IActionResult UploadsUser(IFormFile file)
         {
             try
             {
                 Authenticate();
 
-                string base64 = fReq.Base64 ?? "";
-                if (string.IsNullOrEmpty(base64)) throw new BadRequestException("Base64 is required");
+                string base64 = "";
+                if (file.Length > 0)
+                {
+                    var memoryStream = new MemoryStream();
+                    file.CopyTo(memoryStream);
+                    base64 = Convert.ToBase64String(memoryStream.ToArray());
+                }
+                if (string.IsNullOrEmpty(base64)) throw new BadRequestException("File is required");
 
                 var userList = _context.ExecQuery(
                     Entities.User.GetByUsernameQuery(),
@@ -63,8 +69,8 @@ namespace BookReaderAPI.Controllers
 
                 if (user.ProfilePicFileId == null || user.ProfilePicFileId == 0)
                 {
-                    var file = _context.Insert(new Entities.File { Base64 = base64 });
-                    var fileId = (file.First() as Entities.File)!.Id;
+                    var fileData = _context.Insert(new Entities.File { Base64 = base64 });
+                    var fileId = (fileData.First() as Entities.File)!.Id;
                     user.ProfilePicFileId = fileId;
 
                     _context.Update(user.Id, user);

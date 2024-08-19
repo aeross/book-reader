@@ -9,7 +9,7 @@
         public string? Username { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
-        public int? ProfilePicFileId { get; set; }
+        public string? ProfilePicBase64 { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
     }
