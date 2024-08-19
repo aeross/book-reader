@@ -39,6 +39,7 @@ export type User = {
     firstName?: string;
     lastName?: string;
     profilePicFileId?: number;
+    profilePicBase64?: string;
     createdAt: Date;
     updatedAt: Date;
 }

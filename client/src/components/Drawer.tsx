@@ -9,7 +9,6 @@ const Drawer = ({ isOpen, setIsOpen }: { isOpen: boolean, setIsOpen: Dispatch<Se
             className={`fixed inset-0 z-20 ${isOpen ? 'translate-x-0 bg-gray-800 bg-opacity-75 transform transition-colors duration-300 ease-in-out' : '-translate-x-full'}
                 flex`
             }
-
         >
             <div className="w-96 h-full z-40 bg-orange-50 shadow-md">
                 <div className="p-6 flex flex-col">
