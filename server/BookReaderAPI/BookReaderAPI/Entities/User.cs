@@ -61,7 +61,7 @@ namespace BookReaderAPI.Entities
         public static string GetByUsernameQuery()
         {
             return @"SELECT users.*, files.base_64 AS base64 
-            FROM public.users INNER JOIN public.files ON users.profile_pic_file_id = files.id
+            FROM public.users FULL OUTER JOIN public.files ON users.profile_pic_file_id = files.id
             WHERE username = @Username
             ";
         }

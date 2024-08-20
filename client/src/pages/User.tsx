@@ -4,6 +4,7 @@ import agent from "../API/axios";
 import { setUser } from "../store/userSlice";
 import imageCompression from "browser-image-compression";
 import Button from "../components/Button";
+import Image from "../components/Image";
 
 function User() {
     const { user } = useAppSelector(state => state.user);
@@ -52,7 +53,7 @@ function User() {
                     <h1 className="text-2xl font-semibold">{user?.username}</h1>
                     <p className="text-lg">{user?.firstName}</p>
                     <p className="text-lg">{user?.lastName}</p>
-                    <img src={`data:image/png;base64,${user?.profilePicBase64}`} alt="Base64 Example" />
+                    <Image base64={user?.profilePicBase64} />
                     <button>Edit</button>
 
                     {file && <section>
