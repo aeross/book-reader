@@ -4,6 +4,7 @@ import Login from "./Login";
 import Register from "./Register";
 import App from "../App";
 import User from "./User";
+import BookPage from "./BookPage";
 
 export const router = createBrowserRouter([
     {
@@ -25,6 +26,10 @@ export const router = createBrowserRouter([
             {
                 path: '/user',
                 element: <User />
+            },
+            {
+                path: '/book/:id',
+                element: <BookPage />
             }
         ]
     },

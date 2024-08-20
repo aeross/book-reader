@@ -12,6 +12,9 @@ function App() {
 
     async function fetchCurrentUser() {
         try {
+            // refresh axios instance's token
+            agent.defaults.headers['Authorization'] = "Bearer " + localStorage.getItem("token");
+
             const res = await agent.get<APIResponse<User>>("user");
             const data = res.data.data;
             dispatch(setUser({ user: data, userLoaded: true }));

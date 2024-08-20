@@ -1,9 +1,8 @@
-
-import { faArrowRightToBracket, faBars, faSearch, faUser } from "@fortawesome/free-solid-svg-icons"
+import Image from "./Image";
+import { faArrowRightToBracket, faSearch, faUser } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { Link, useNavigate } from "react-router-dom"
-import { useAppDispatch, useAppSelector } from "../store/configureStore";
-import { setUser } from "../store/userSlice";
+import { useAppSelector } from "../store/configureStore";
 import { useState } from "react";
 import Drawer from "./Drawer";
 
@@ -12,12 +11,6 @@ function Nav() {
     const navigate = useNavigate();
 
     const { user, userLoaded } = useAppSelector(state => state.user);
-    const dispatch = useAppDispatch();
-
-    async function handleLogout() {
-        localStorage.removeItem("token");
-        dispatch(setUser({ userLoaded: false }));
-    }
 
     // drawer
     const [isOpen, setIsOpen] = useState(false);
@@ -25,13 +18,8 @@ function Nav() {
 
     return (
         <>
-            <nav className="sticky top-0 z-10 p-3 pt-4 bg-orange-50 shadow grid grid-cols-5">
-                <div className="flex justify-start gap-6 px-5 pb-2 col-span-2">
-
-                    <button className="flex items-center pt-[3px]" onClick={() => setIsOpen(true)}>
-                        <FontAwesomeIcon icon={faBars} className="text-3xl opacity-65" />
-                    </button>
-
+            <nav className="sticky top-0 z-10 p-3 pt-4 bg-orange-50 shadow grid grid-cols-[3fr_3fr_2fr]">
+                <div className="flex justify-start gap-6 px-5 pb-2">
                     <Drawer isOpen={isOpen} setIsOpen={setIsOpen} />
 
                     <div>
@@ -49,7 +37,7 @@ function Nav() {
                         </div>
                     </div>
                 </div>
-                <div className="flex items-center justify-start relative w-full col-span-2">
+                <div className="flex items-center justify-start relative w-full">
                     <input type="text" className="rounded-2xl border border-slate-300 h-full w-full 
                     pr-3 pl-12 focus:outline-none focus:ring focus:ring-yellow-500" />
                     <button className="ml-3 absolute"><FontAwesomeIcon icon={faSearch} className="text-2xl opacity-70" /></button>
@@ -57,9 +45,8 @@ function Nav() {
 
                 <div className="flex justify-end gap-6 px-6">
                     {userLoaded && user &&
-                        <button onClick={handleLogout} className="flex flex-col items-center justify-end gap-1 opacity-70">
-                            <FontAwesomeIcon icon={faArrowRightToBracket} className="text-2xl" />
-                            <span className="text-xs">Logout</span>
+                        <button className="flex items-center" onClick={() => setIsOpen(true)}>
+                            <Image base64={user?.profilePicBase64} size="icon" />
                         </button>
                     }
                     {userLoaded && !user &&
