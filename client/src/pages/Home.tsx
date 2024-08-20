@@ -51,7 +51,7 @@ function Home() {
 
       {!loading &&
         <div className="outer container">
-          <h2 className="text-3xl font-bold mb-4 mt-6">Your books</h2>
+          <h2 className="text-3xl font-bold mb-4">Your books</h2>
           <div className="grid grid-cols-5 gap-2">
             {
               booksUser.map(book => {

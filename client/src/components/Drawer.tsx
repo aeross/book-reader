@@ -43,8 +43,8 @@ const Drawer = ({ isOpen, setIsOpen }: { isOpen: boolean, setIsOpen: Dispatch<Se
                             <Link to="/" onClick={() => setIsOpen(false)} className="flex items-center justify-center"><FontAwesomeIcon icon={faHouse} className="opacity-45" /></Link>
                             <Link to="/" onClick={() => setIsOpen(false)} className="px-1 my-1">Home</Link>
 
-                            <Link to="/user" onClick={() => setIsOpen(false)} className="flex items-center justify-center"><FontAwesomeIcon icon={faIdCard} className="opacity-45" /></Link>
-                            <Link to="/user" onClick={() => setIsOpen(false)} className="px-1 my-1">Profile</Link>
+                            <Link to={`user/${user.username}`} onClick={() => setIsOpen(false)} className="flex items-center justify-center"><FontAwesomeIcon icon={faIdCard} className="opacity-45" /></Link>
+                            <Link to={`user/${user.username}`} onClick={() => setIsOpen(false)} className="px-1 my-1">Profile</Link>
 
                             <Link to="/" onClick={() => setIsOpen(false)} className="flex items-center justify-center"><FontAwesomeIcon icon={faThumbsUp} className="opacity-45" /></Link>
                             <Link to="/" onClick={() => setIsOpen(false)} className="px-1 my-1">Liked</Link>
