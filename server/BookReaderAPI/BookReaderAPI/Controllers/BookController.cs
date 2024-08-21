@@ -14,6 +14,7 @@ namespace BookReaderAPI.Controllers
     {
         public BookController(IConfiguration config) : base(config) { }
 
+
         [HttpGet]
         public IActionResult Get([FromQuery] string search = "", string sort = "", string filter = "",
             int page = 1, int limit = 5)
@@ -31,6 +32,12 @@ namespace BookReaderAPI.Controllers
 
                 foreach (var book in data)
                 {
+                    string? base64 = null;
+                    if (book.cover_img_file_id != null)
+                    {
+                        base64 = GetBase64((int)book.cover_img_file_id);
+                    }
+
                     booksDTO.Add(new BookDTO
                     {
                         Id = book.id,
@@ -41,6 +48,7 @@ namespace BookReaderAPI.Controllers
                         Views = book.views,
                         Likes = book.likes_count,
                         CoverImgFileId = book.cover_img_file_id,
+                        CoverImgBase64 = base64,
                         CreatedAt = book.created_at,
                         UpdatedAt = book.updated_at,
                     });
@@ -70,7 +78,8 @@ namespace BookReaderAPI.Controllers
                 Int64 likesCount = likes.First().likes_count;
 
                 Book book = data.First();
-                BookDTO bookDTO = book.ToDTO(likesCount);
+                string base64 = GetBase64(book.CoverImgFileId);
+                BookDTO bookDTO = book.ToDTO(coverImgBase64: base64, likes: likesCount);
 
                 var result = GetAPIResult(bookDTO);
                 return Ok(result);
@@ -87,7 +96,22 @@ namespace BookReaderAPI.Controllers
             try
             {
                 var data = _context.Get<Book>();
-                var result = GetAPIResult(data);
+
+                List<BookDTO> booksDTO = [];
+                foreach (Book book in data)
+                {
+                    var likes = _context.ExecQuery(
+                    Like.CountAllUsersWhoLikesABook(),
+                    new DbParams { Name = "BookId", Value = book.Id }
+                    );
+                    Int64 likesCount = likes.First().likes_count;
+
+                    string base64 = GetBase64(book.CoverImgFileId);
+
+                    booksDTO.Add(book.ToDTO(coverImgBase64: base64, likes: likesCount));
+                }
+
+                var result = GetAPIResult(booksDTO);
                 return Ok(result);
             }
             catch (Exception e)
@@ -137,6 +161,23 @@ namespace BookReaderAPI.Controllers
                 return HandleException(e);
             }
         }
+
+        [HttpPatch("{id}")]
+        public IActionResult AddViews(int id)
+        {
+            try
+            {
+                _context.ExecQuery(Book.IncrementViews(), new DbParams { Name = "id", Value = id });
+
+                var result = GetAPIResult("Views added");
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+
 
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)

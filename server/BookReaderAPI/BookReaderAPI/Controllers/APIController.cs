@@ -117,5 +117,28 @@ namespace BookReaderAPI.Controllers
 
             return readlist.First();
         }
+
+
+        /// <summary>
+        /// Gets the base64 value for a certain entity that has a file id.
+        /// </summary>
+        /// <param name="fileId">The file id.</param>
+        /// <returns></returns>
+        [NonAction]
+        protected string GetBase64(int? fileId)
+        {
+            string base64 = "";
+            if (fileId != null && fileId != 0)
+            {
+                var data = _context.GetById<Entities.File>(fileId ?? default);
+                if (data.Any())
+                {
+                    Entities.File file = data.First();
+                    base64 = file.Base64 ?? "";
+                }
+            }
+
+            return base64;
+        }
     }
 }

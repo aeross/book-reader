@@ -162,8 +162,9 @@ namespace BookReaderAPI.Entities
                 "title-desc" => " GROUP BY books.id ORDER BY books.title DESC",
                 "views" => " GROUP BY books.id ORDER BY books.views DESC",
                 "likes" => " GROUP BY books.id ORDER BY COUNT(likes.id) DESC",
-                _ => " GROUP BY books.id"
+                _ => string.IsNullOrWhiteSpace(search) ? " GROUP BY books.id" : ""
             };
+            
             query += sortQuery;
 
             if (!string.IsNullOrWhiteSpace(filter))

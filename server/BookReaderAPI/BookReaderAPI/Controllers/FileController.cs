@@ -18,6 +18,8 @@ namespace BookReaderAPI.Controllers
             _config = config;
         }
 
+        // deprecated.
+        /*
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
@@ -34,6 +36,7 @@ namespace BookReaderAPI.Controllers
                 return HandleException(e);
             }
         }
+        */
 
         /// <summary>
         /// Uploads profile pic file for the User entity.

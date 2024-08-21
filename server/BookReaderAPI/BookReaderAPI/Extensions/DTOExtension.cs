@@ -5,7 +5,7 @@ namespace BookReaderAPI.Extensions
 {
     public static class DTOExtension
     {
-        public static BookDTO ToDTO(this Book book, Int64 likes = 0, Int64 comments = 0)
+        public static BookDTO ToDTO(this Book book, string coverImgBase64 = "", Int64 likes = 0, Int64 comments = 0)
         {
             return new BookDTO
             {
@@ -15,6 +15,7 @@ namespace BookReaderAPI.Extensions
                 Tagline = book.Tagline,
                 Description = book.Description,
                 CoverImgFileId = book.CoverImgFileId,
+                CoverImgBase64 = coverImgBase64,
                 Views = book.Views,
                 Likes = likes,
                 Comments = comments,

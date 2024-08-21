@@ -8,6 +8,7 @@
         public string? Tagline { get; set; }
         public string? Description { get; set; }
         public int? CoverImgFileId { get; set; }
+        public string? CoverImgBase64 { get; set; }
         public Int64? Views { get; set; }
         public Int64 Likes { get; set; } = 0;
         public Int64 Comments { get; set; } = 0;

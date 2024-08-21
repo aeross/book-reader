@@ -32,7 +32,7 @@ namespace BookReaderAPI.Controllers
                     Entities.User.GetAuthoredBooks(),
                     new DbParams { Name = "Username", Value = username });
 
-                //// serialize to User objects
+                // serialize to User objects
                 List<BookDTO> booksDTO = new();
                 foreach (var book in books)
                 {
@@ -40,6 +40,12 @@ namespace BookReaderAPI.Controllers
                         Like.CountAllUsersWhoLikesABook(),
                         new DbParams { Name = "BookId", Value = book.id });
                     Int64 likesCount = likes.First().likes_count;
+
+                    string? base64 = null;
+                    if (book.cover_img_file_id != null)
+                    {
+                        base64 = GetBase64((int)book.cover_img_file_id);
+                    }
 
                     booksDTO.Add(new BookDTO
                     {
@@ -49,6 +55,7 @@ namespace BookReaderAPI.Controllers
                         Description = book.description,
                         Genre = book.genre,
                         CoverImgFileId = book.cover_img_file_id,
+                        CoverImgBase64 = base64,
                         Views = book.views,
                         Likes = likesCount,
                         //Comments = book.comments,
@@ -85,6 +92,12 @@ namespace BookReaderAPI.Controllers
                     );
                     var likesCount = likes.First().likes_count;
 
+                    string? base64 = null;
+                    if (item.cover_img_file_id != null)
+                    {
+                        base64 = GetBase64((int)item.cover_img_file_id);
+                    }
+
                     books.Add(new BookDTO
                     {
                         Id = item.id,
@@ -93,6 +106,7 @@ namespace BookReaderAPI.Controllers
                         Tagline = item.tagline,
                         Description = item.description,
                         CoverImgFileId = item.cover_img_file_id,
+                        CoverImgBase64 = base64,
                         Views = item.views,
                         Likes = likesCount,
                         //Comments = item.comments,
@@ -235,6 +249,34 @@ namespace BookReaderAPI.Controllers
 
                 APIResult result = GetAPIResult(userDTO, 201);
                 return Created(string.Empty, result);
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+
+        [HttpPut]
+        public IActionResult Update([FromBody] User body)
+        {
+            try
+            {
+                var userId = Authenticate();
+
+                if (body.FirstName == null || string.IsNullOrWhiteSpace(body.FirstName))
+                    throw new BadRequestException("First name must not be empty");
+
+                if (body.LastName == null || string.IsNullOrWhiteSpace(body.LastName))
+                    throw new BadRequestException("Last name must not be empty");
+
+                _context.ExecQuery(
+                    Entities.User.UpdateQuery(),
+                    new DbParams { Name = "UserId", Value = userId, Type = "int" },
+                    new DbParams { Name = "FirstName", Value = body.FirstName, Type = "str" },
+                    new DbParams { Name = "LastName", Value = body.LastName, Type = "str" }
+                );
+
+                return Ok(GetAPIResult("Updated"));
             }
             catch (Exception e)
             {

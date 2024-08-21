@@ -56,6 +56,19 @@ namespace BookReaderAPI.Entities
         // non-standard crud queries
 
         /// <summary>
+        /// params: @FirstName str, @LastName str, @UserId int
+        /// </summary>
+        public static string UpdateQuery()
+        {
+            return @"UPDATE public.users
+            SET first_name = @FirstName,
+                last_name = @LastName,
+                updated_at = now()
+            WHERE id = @UserId
+            ";
+        }
+
+        /// <summary>
         /// params: @Username str
         /// </summary>
         public static string GetByUsernameQuery()
