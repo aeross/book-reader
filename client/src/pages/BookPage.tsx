@@ -4,13 +4,16 @@ import agent from "../API/axios";
 import { Link, useParams } from "react-router-dom";
 import ImageBook from "../components/ImageBook";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faThumbsUp } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faEye, faThumbsUp, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { formatLargeNumber } from "../API/helper";
 import Loading from "../components/Loading";
 import ImageUser from "../components/ImageUser";
+import { useAppSelector } from "../store/configureStore";
 
 export default function BookPage() {
     const { id } = useParams();
+
+    const { user } = useAppSelector(state => state.user);
 
     const [loading, setLoading] = useState(true);
 
@@ -62,6 +65,48 @@ export default function BookPage() {
         }
     }
 
+    function checkIfUserIsAnAuthor() {
+        if (!authors) return false;
+        if (!user) return false;
+
+        let output = false;
+        for (let i = 0; i < authors.length; i++) {
+            let author = authors[i];
+            if (author.username === user.username) {
+                output = true;
+                break;
+            }
+        }
+        return output;
+    }
+
+    function getWordCount() {
+        if (!chapters) return 0;
+
+        let wordCount = 0;
+        chapters.forEach(c => {
+            wordCount += c.numOfWords ?? 0;
+        })
+        return wordCount;
+    }
+
+    // in minutes.
+    function getEstimatedReadTime() {
+        if (!chapters) return 0;
+
+        let ert = Math.round(getWordCount() / 200);
+
+        let output = "";
+        if (ert > 150) {
+            ert = Math.round(ert / 60);
+            output = ert.toString() + " hours";
+        } else {
+            output = ert.toString() + " minutes";
+        }
+
+        return output;
+    }
+
     useEffect(() => {
         (async () => {
             await fetchBook();
@@ -86,36 +131,53 @@ export default function BookPage() {
                             <h2 className="text-3xl font-bold mb-1">{book?.title}</h2>
                             <div className="text-md font-semibold italic mb-6">{book?.tagline}</div>
 
-                            <p>{book?.description}</p>
+                            <p className="whitespace-pre-line">{book?.description}</p>
                         </div>
-                        <div>
-                            <p className="mb-1 text-sm">
-                                Authored by: {authors?.map((author, i) => {
-                                    if (author.username) {
-                                        return ((i + 1) == authors.length)
-                                            ? <Link to={`/user/${author.username}`} className="hover:underline">@{author.username}</Link>
-                                            : <Link to={`/user/${author.username}`} className="hover:underline">@{author.username}, </Link>
-                                    }
-                                })}
-                            </p>
-                            <div className="flex gap-3">
-                                <span>
-                                    {book ? formatLargeNumber(book.views) : undefined} <FontAwesomeIcon icon={faEye} className="opacity-60" />
-                                </span>
-                                <span>{book?.likes} <FontAwesomeIcon icon={faThumbsUp} className="opacity-60" /></span>
+                        <div className="flex justify-between">
+                            <div className="">
+                                <p className="mb-1 text-sm">
+                                    Authored by: {authors?.map((author, i) => {
+                                        if (author.username) {
+                                            return ((i + 1) == authors.length)
+                                                ? <Link to={`/user/${author.username}`} className="hover:underline">@{author.username}</Link>
+                                                : <Link to={`/user/${author.username}`} className="hover:underline">@{author.username}, </Link>
+                                        }
+                                    })}
+                                </p>
+                                <div className="flex gap-3">
+                                    <span>
+                                        {book ? formatLargeNumber(book.views) : undefined} <FontAwesomeIcon icon={faEye} className="opacity-60" />
+                                    </span>
+                                    <span>{book?.likes} <FontAwesomeIcon icon={faThumbsUp} className="opacity-60" /></span>
+                                </div>
                             </div>
+                            <span className="flex items-end">
+                                {checkIfUserIsAnAuthor() &&
+                                    <Link to={`/book/edit/${id}`}><FontAwesomeIcon icon={faEdit} className="opacity-60 text-2xl hover:opacity-85" /></Link>
+                                }
+                            </span>
                         </div>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-3 mt-6 gap-8">
+                <div className="grid grid-cols-3 mt-8 gap-10">
                     <div className="col-span-2">
                         <h2 className="text-3xl font-bold pb-4 px-2 border-b">Chapters</h2>
                         {chapters.map(c => {
                             return (
                                 <Link to="/">
-                                    <div className="text-lg border-b p-2 hover:bg-slate-100">
-                                        {c.title}
+                                    <div className="text-lg border-b p-2 hover:bg-slate-100 flex justify-between [&>div]:hover:flex">
+                                        <span>{c.title}</span>
+                                        {checkIfUserIsAnAuthor() &&
+                                            <div className="hidden gap-4">
+                                                <span>
+                                                    <Link to={`/book/edit/${id}`}><FontAwesomeIcon icon={faEdit} className="opacity-60 hover:opacity-85" /></Link>
+                                                </span>
+                                                <span>
+                                                    <Link to={`/book/edit/${id}`}><FontAwesomeIcon icon={faTrash} className="opacity-60 hover:opacity-85" /></Link>
+                                                </span>
+                                            </div>
+                                        }
                                     </div>
                                 </Link>
                             )
@@ -123,6 +185,35 @@ export default function BookPage() {
                     </div>
 
                     <div>
+                        <h2 className="text-3xl font-bold mb-4">Details</h2>
+                        <div className="mb-10 flex flex-col gap-1 [&>*]:flex [&>*]:justify-between">
+                            <div>
+                                <span className="font-semibold">Genre</span>
+                                <span className="flex flex-wrap gap-1">{
+                                    book?.genre && book?.genre.split(",").map(genre => {
+                                        return <span className="bg-orange-50 text-xs font-semibold shadow text-black text-opacity-85 rounded-full px-2 py-1">
+                                            {genre}
+                                        </span>
+                                    })}
+                                </span>
+                            </div>
+                            <div><span className="font-semibold">Word Count</span><span>{getWordCount()}</span></div>
+                            <div><span className="font-semibold">Estimated Read Time</span><span>{getEstimatedReadTime()}</span></div>
+                            <div><span className="font-semibold">Views</span><span>{book?.views}</span></div>
+                            <div><span className="font-semibold">Likes</span><span>{book?.likes}</span></div>
+                            <div>
+                                <span className="font-semibold">
+                                    Published on</span>
+                                <span>
+                                    {book?.updatedAt && new Date(book.updatedAt).toLocaleDateString('en-EN', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric',
+                                    })}
+                                </span>
+                            </div>
+                        </div>
+
                         <h2 className="text-3xl font-bold mb-4">Contributors</h2>
                         {authors?.map(author => {
                             return (

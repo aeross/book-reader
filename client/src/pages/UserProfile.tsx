@@ -48,7 +48,6 @@ function UserProfile() {
                         <p>121 Total Views</p>
                         <p>14 Total Likes</p>
                         <p>3 Books Authored</p>
-                        <p>Member for 6y3m</p>
                     </div>
                 </div>
 

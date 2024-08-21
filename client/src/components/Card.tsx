@@ -14,9 +14,9 @@ function Card({ book }: { book: Book }) {
                 <div>
                     <Link to={`book/${book.id}`} className="font-semibold text-lg px-1 hover:underline">{book.title}</Link>
 
-                    <div className="flex flex-wrap gap-1 my-1">
+                    <div className="flex flex-wrap gap-1 my-[6px]">
                         {book.genre && book.genre.split(",").map(genre => {
-                            return <span className="bg-orange-50 text-xs text-black text-opacity-70 rounded-full px-2 py-1">{genre}</span>
+                            return <span className="bg-orange-50 text-xs font-semibold shadow text-black text-opacity-70 rounded-full px-2 py-1">{genre}</span>
                         })}
                     </div>
 
@@ -30,7 +30,7 @@ function Card({ book }: { book: Book }) {
 
                 <div className="flex justify-between text-sm px-1">
                     <div></div>
-                    <Link to={`book/${book.id}`} className="flex justify-center items-center rounded-full bg-orange-50 p-2 w-7 h-7 hover:bg-orange-100 hover:opacity-85">
+                    <Link to={`book/${book.id}`} className="flex justify-center items-center shadow rounded-full bg-orange-50 p-2 w-7 h-7 hover:bg-orange-100 hover:opacity-85">
                         <FontAwesomeIcon icon={faInfo} className="opacity-60" />
                     </Link>
                 </div>
