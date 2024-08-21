@@ -241,12 +241,18 @@ namespace BookReaderAPI.Controllers
                 List<UserDTO> users = new();
                 foreach (var item in authors)
                 {
+                    string? base64 = null;
+                    if (item.profile_pic_file_id != null)
+                    {
+                        base64 = GetBase64((int)item.profile_pic_file_id);
+                    }
                     users.Add(new UserDTO
                     {
                         Id = item.id,
                         Username = item.username,
                         FirstName = item.first_name,
                         LastName = item.last_name,
+                        ProfilePicBase64 = base64,
                         CreatedAt = item.created_at,
                         UpdatedAt = item.updated_at
                     });
