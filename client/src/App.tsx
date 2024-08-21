@@ -5,6 +5,7 @@ import { APIResponse, User } from './API/types';
 import Nav from './components/Nav';
 import { useAppDispatch, useAppSelector } from './store/configureStore';
 import { setUser } from './store/userSlice';
+import Loading from './components/Loading';
 
 function App() {
     const { userLoaded } = useAppSelector(state => state.user);
@@ -32,7 +33,8 @@ function App() {
         <>
             <Nav />
 
-            <Outlet />
+            {userLoaded && <Outlet />}
+            {!userLoaded && <Loading message="Loading user..." />}
         </>
     )
 }

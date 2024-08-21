@@ -4,7 +4,7 @@ import agent from "../API/axios";
 import { setUser } from "../store/userSlice";
 import imageCompression from "browser-image-compression";
 import Button from "../components/Button";
-import Image from "../components/Image";
+import ImageUser from "../components/ImageUser";
 
 function UserEdit() {
     const { user } = useAppSelector(state => state.user);
@@ -36,12 +36,24 @@ function UserEdit() {
         if (file) formData.append("file", file);
         await agent.post("file/user", formData);
 
+        setFile(null);
         dispatch(setUser({ ...user, userLoaded: false }));
     }
 
     async function handleDelete(event: React.FormEvent) {
         event.preventDefault();
         await agent.delete("file/user");
+
+        dispatch(setUser({ ...user, userLoaded: false }));
+    }
+
+
+    const [firstName, setFirstName] = useState(user?.firstName);
+    const [lastName, setLastName] = useState(user?.lastName);
+
+    async function handleEdit(event: React.FormEvent) {
+        event.preventDefault();
+        await agent.put("user", { firstName, lastName });
 
         dispatch(setUser({ ...user, userLoaded: false }));
     }
@@ -53,7 +65,7 @@ function UserEdit() {
                     <h1 className="text-2xl font-semibold">{user?.username}</h1>
                     <p className="text-lg">{user?.firstName}</p>
                     <p className="text-lg">{user?.lastName}</p>
-                    <Image base64={user?.profilePicBase64} />
+                    <ImageUser base64={user?.profilePicBase64} />
 
                     {file && <section>
                         File details:
@@ -76,6 +88,16 @@ function UserEdit() {
                         }
                         {user?.profilePicBase64 && <Button text={"delete"} onClick={(e) => handleDelete(e)} />}
                     </div>
+                </form>
+
+                <form className="flex flex-col my-2 gap-2">
+                    <label htmlFor="first-name">First Name</label>
+                    <input type="text" id="first-name" onChange={(e) => setFirstName(e.target.value)} />
+
+                    <label htmlFor="last-name">Last Name</label>
+                    <input type="text" id="last-name" onChange={(e) => setLastName(e.target.value)} />
+
+                    <button onClick={handleEdit}>Update</button>
                 </form>
             </div>
         </>

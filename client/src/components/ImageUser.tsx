@@ -1,7 +1,7 @@
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export default function Image({ base64, alt, size }: { base64?: string, alt?: string, size?: string }) {
+export default function ImageUser({ base64, alt, size }: { base64?: string, alt?: string, size?: string }) {
 
     let sizeStr;
     switch (size) {

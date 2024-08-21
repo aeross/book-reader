@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 import { useAppDispatch, useAppSelector } from "../store/configureStore";
-import Image from "./Image";
+import ImageUser from "./ImageUser";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRightToBracket, faBook, faGear, faHouse, faIdCard, faList, faThumbsUp } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
@@ -27,10 +27,10 @@ const Drawer = ({ isOpen, setIsOpen }: { isOpen: boolean, setIsOpen: Dispatch<Se
                 <div className="w-96 h-full z-40 bg-orange-50 shadow-md flex flex-col justify-between">
                     <div className="p-6 flex flex-col">
                         <div className="flex flex-row gap-4 items-center justify-start">
-                            <Image base64={user?.profilePicBase64} size="xs" />
+                            <ImageUser base64={user?.profilePicBase64} size="xs" />
                             <div>
                                 <h2 className="text-xl font-semibold">{user?.firstName} {user?.lastName}</h2>
-                                <Link to="/user" onClick={() => setIsOpen(false)} className="text-md font-semibold">@{user?.username}</Link>
+                                <div className="text-md font-semibold">@{user?.username}</div>
                             </div>
                         </div>
                         <div className="mt-4">
@@ -58,8 +58,8 @@ const Drawer = ({ isOpen, setIsOpen }: { isOpen: boolean, setIsOpen: Dispatch<Se
 
                     </div>
                     <div className="p-6 grid grid-cols-[1fr_7fr]">
-                        <Link to="/" onClick={() => setIsOpen(false)} className="flex items-center justify-center"><FontAwesomeIcon icon={faGear} className="opacity-45" /></Link>
-                        <Link to="/" onClick={() => setIsOpen(false)} className="px-1 my-1">Settings</Link>
+                        <Link to="/user" onClick={() => setIsOpen(false)} className="flex items-center justify-center"><FontAwesomeIcon icon={faGear} className="opacity-45" /></Link>
+                        <Link to="/user" onClick={() => setIsOpen(false)} className="px-1 my-1">Settings</Link>
 
                         <Link to="/" onClick={handleLogout} className="flex items-center justify-center"><FontAwesomeIcon icon={faArrowRightToBracket} className="opacity-45" /></Link>
                         <Link to="/" onClick={handleLogout} className="px-1 my-1">Logout</Link>

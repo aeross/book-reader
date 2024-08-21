@@ -5,6 +5,7 @@ export type Book = {
     tagline?: string;
     description?: string;
     coverImgFileId?: number;
+    coverImgBase64?: string;
     views: number;
     likes: number;
     createdAt: Date;

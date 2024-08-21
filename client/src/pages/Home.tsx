@@ -11,7 +11,7 @@ function Home() {
   const [loading, setLoading] = useState(false);
 
   const [booksRand, setBooksRand] = useState<Book[]>([]);
-  const [booksUser, setBooksUser] = useState<Book[]>([]);
+  const [booksLiked, setBooksLiked] = useState<Book[]>([]);
 
   async function fetchBooksRandom() {
     try {
@@ -23,12 +23,12 @@ function Home() {
     }
   }
 
-  async function fetchBooksOwnedByUser() {
+  async function fetchBooksLikedByUser() {
     try {
       if (!user) return;
-      const res = await agent.get<APIResponse<Book[]>>(`user/${user.username}/books`);
+      const res = await agent.get<APIResponse<Book[]>>(`user/${user.username}/likes`);
       const data = res.data.data;
-      if (data) setBooksUser(data);
+      if (data) setBooksLiked(data);
     } catch (error) {
       console.log(error);
     }
@@ -38,7 +38,7 @@ function Home() {
     setLoading(true);
     (async () => {
       await fetchBooksRandom();
-      await fetchBooksOwnedByUser();
+      await fetchBooksLikedByUser();
       setLoading(false);
     })();
   }, [user]);
@@ -51,17 +51,17 @@ function Home() {
 
       {!loading &&
         <div className="outer container">
-          <h2 className="text-3xl font-bold mb-4">Your books</h2>
-          <div className="grid grid-cols-5 gap-2">
+          <h2 className="text-3xl font-bold mb-4">Jump back in</h2>
+          <div className="grid grid-cols-5 gap-5">
             {
-              booksUser.map(book => {
+              booksLiked.map(book => {
                 return <Card key={book.id} book={book} />
               })
             }
           </div>
 
           <h2 className="text-3xl font-bold mb-4 mt-6">Your readlists</h2>
-          <div className="grid grid-cols-5 gap-2">
+          <div className="grid grid-cols-5 gap-5">
             {
               booksRand.map(book => {
                 return <Card key={book.id} book={book} />
@@ -70,7 +70,7 @@ function Home() {
           </div>
 
           <h2 className="text-3xl font-bold mb-4 mt-6">Random books picked for you</h2>
-          <div className="grid grid-cols-5 gap-2">
+          <div className="grid grid-cols-5 gap-5">
             {
               booksRand.map(book => {
                 return <Card key={book.id} book={book} />

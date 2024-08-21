@@ -1,21 +1,41 @@
+import { Link } from "react-router-dom"
 import { Book } from "../API/types"
+import ImageBook from "./ImageBook"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faEye, faInfo, faThumbsUp } from "@fortawesome/free-solid-svg-icons"
+import { formatLargeNumber } from "../API/helper"
 
 function Card({ book }: { book: Book }) {
     return (
-        <div className="p-2 border rounded">
-            <h2>{book.title}</h2>
-            <img src="" alt="image"></img>
-            <div>
-                <p>{book.tagline}</p>
-                <p>{book.genre}</p>
-                <p>{book.views}</p>
-                <p>{book.likes}</p>
+        <div className="border rounded-lg overflow-hidden shadow flex flex-col">
+            <Link to={`book/${book.id}`}><ImageBook base64={book.coverImgBase64} size="full" /></Link>
+
+            <div className="p-[6px] flex flex-col h-full justify-between">
+                <div>
+                    <Link to={`book/${book.id}`} className="font-semibold text-lg px-1 hover:underline">{book.title}</Link>
+
+                    <div className="flex flex-wrap gap-1 my-1">
+                        {book.genre && book.genre.split(",").map(genre => {
+                            return <span className="bg-orange-50 text-xs text-black text-opacity-70 rounded-full px-2 py-1">{genre}</span>
+                        })}
+                    </div>
+
+                    <div className="flex justify-between text-sm px-1">
+                        <div className="flex gap-3">
+                            <span>{formatLargeNumber(book.views)} <FontAwesomeIcon icon={faEye} className="opacity-60" /></span>
+                            <span>{book.likes} <FontAwesomeIcon icon={faThumbsUp} className="opacity-60" /></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex justify-between text-sm px-1">
+                    <div></div>
+                    <Link to={`book/${book.id}`} className="flex justify-center items-center rounded-full bg-orange-50 p-2 w-7 h-7 hover:bg-orange-100 hover:opacity-85">
+                        <FontAwesomeIcon icon={faInfo} className="opacity-60" />
+                    </Link>
+                </div>
             </div>
-            <div className="flex justify-between">
-                <button>Button 1</button>
-                <button>Button 2</button>
-            </div>
-        </div>
+        </div >
     )
 }
 

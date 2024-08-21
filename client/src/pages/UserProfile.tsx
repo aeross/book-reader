@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import agent from "../API/axios";
-import Image from "../components/Image";
+import ImageUser from "../components/ImageUser";
 import { APIResponse, Book, User } from "../API/types";
 import { useParams } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 
 function UserProfile() {
     const { username } = useParams();
@@ -35,14 +37,14 @@ function UserProfile() {
     return (
         <>
             <div className="outer container">
-                <div className="grid grid-cols-[1fr_2fr] mb-2 rounded shadow">
-                    <div className="flex flex-col items-center bg-orange-50 py-6 border-r-[0.5px] border-slate-100 rounded">
-                        <Image base64={user?.profilePicBase64} size="l" />
+                <div className="flex justify-center gap-14 mb-2 bg-orange-50 py-6 rounded-lg shadow">
+                    <div className="flex flex-col items-center ">
+                        <ImageUser base64={user?.profilePicBase64} size="l" />
                         <h2 className="text-2xl font-semibold text-center">{user?.firstName} {user?.lastName}</h2>
                         <div className="text-md font-semibold text-center">@{user?.username}</div>
                     </div>
-                    <div className="bg-slate-50">
-                        <h3>stats/info</h3>
+                    <div className="pl-4">
+                        <FontAwesomeIcon icon={faCircleInfo} />
                         <p>121 Total Views</p>
                         <p>14 Total Likes</p>
                         <p>3 Books Authored</p>
@@ -50,6 +52,7 @@ function UserProfile() {
                     </div>
                 </div>
 
+                <h2 className="text-3xl font-bold mb-4 mt-6">Books</h2>
                 <div className="pt-4 grid grid-cols-[1fr_2fr] rounded">
                     <div>
                         {booksUser.map(book => {

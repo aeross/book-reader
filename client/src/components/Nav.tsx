@@ -1,4 +1,4 @@
-import Image from "./Image";
+import ImageUser from "./ImageUser";
 import { faArrowRightToBracket, faSearch, faUser } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { Link, useNavigate } from "react-router-dom"
@@ -46,7 +46,7 @@ function Nav() {
                 <div className="flex justify-end gap-6 px-6">
                     {userLoaded && user &&
                         <button className="flex items-center" onClick={() => setIsOpen(true)}>
-                            <Image base64={user?.profilePicBase64} size="icon" />
+                            <ImageUser base64={user?.profilePicBase64} size="icon" />
                         </button>
                     }
                     {userLoaded && !user &&
