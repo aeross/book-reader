@@ -36,7 +36,7 @@ function UserProfile() {
         <>
             <div className="outer container">
                 <div className="grid grid-cols-[1fr_2fr] mb-2 rounded shadow">
-                    <div className="flex flex-col items-center bg-orange-50 py-6 border-r-[0.5px] border-slate-100">
+                    <div className="flex flex-col items-center bg-orange-50 py-6 border-r-[0.5px] border-slate-100 rounded">
                         <Image base64={user?.profilePicBase64} size="l" />
                         <h2 className="text-2xl font-semibold text-center">{user?.firstName} {user?.lastName}</h2>
                         <div className="text-md font-semibold text-center">@{user?.username}</div>
@@ -50,7 +50,7 @@ function UserProfile() {
                     </div>
                 </div>
 
-                <div className="pt-4 grid grid-cols-[1fr_2fr]">
+                <div className="pt-4 grid grid-cols-[1fr_2fr] rounded">
                     <div>
                         {booksUser.map(book => {
                             return <div>{book.title}</div>
