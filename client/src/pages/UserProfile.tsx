@@ -3,11 +3,13 @@ import agent from "../API/axios";
 import ImageUser from "../components/ImageUser";
 import { APIResponse, Book, User } from "../API/types";
 import { useParams } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
+import { formatLargeNumber } from "../API/helper";
+import { useAppSelector } from "../store/configureStore";
 
 function UserProfile() {
     const { username } = useParams();
+
+    // const { user: currUser, userLoaded } = useAppSelector(state => state.user);
 
     const [user, setUser] = useState<User | null>();
     const [booksUser, setBooksUser] = useState<Book[]>([]);
@@ -34,20 +36,51 @@ function UserProfile() {
         })();
     }, [])
 
+    function getTotalViews() {
+        let views = 0;
+        booksUser.forEach(book => {
+            views += book.views;
+        })
+        return views;
+    }
+
+    function getTotalLikes() {
+        let likes = 0;
+        booksUser.forEach(book => {
+            likes += book.likes
+        })
+        return likes;
+    }
+
     return (
         <>
             <div className="outer container">
-                <div className="flex justify-center gap-14 mb-2 bg-orange-50 py-6 rounded-lg shadow">
-                    <div className="flex flex-col items-center ">
+                <div className="flex justify-center gap-28 mb-2 bg-orange-50 py-6 rounded-lg shadow">
+                    <div className="flex flex-col gap-4 items-center">
                         <ImageUser base64={user?.profilePicBase64} size="l" />
-                        <h2 className="text-2xl font-semibold text-center">{user?.firstName} {user?.lastName}</h2>
-                        <div className="text-md font-semibold text-center">@{user?.username}</div>
+                        <div>
+                            <h2 className="text-2xl font-semibold text-center">{user?.firstName} {user?.lastName}</h2>
+                            <div className="text-md font-semibold text-center">@{user?.username}</div>
+                        </div>
                     </div>
-                    <div className="pl-4">
-                        <FontAwesomeIcon icon={faCircleInfo} />
-                        <p>121 Total Views</p>
-                        <p>14 Total Likes</p>
-                        <p>3 Books Authored</p>
+                    <div className="flex flex-col justify-between pt-2 w-1/3">
+                        <div className="[&>p]:flex [&>p]:justify-between">
+                            <p>
+                                <span className="font-semibold">Total Views</span><span>{formatLargeNumber(getTotalViews())}</span>
+                            </p>
+                            <p>
+                                <span className="font-semibold">Total Likes</span><span>{getTotalLikes()}</span>
+                            </p>
+                            <p>
+                                <span className="font-semibold">Books Authored</span><span>{booksUser.length}</span>
+                            </p>
+                        </div>
+                        <p className="flex justify-between">
+                            <span className="font-semibold">Member Since</span><span>{user && new Date(user.updatedAt).toLocaleDateString('en-EN', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                            })}</span></p>
                     </div>
                 </div>
 

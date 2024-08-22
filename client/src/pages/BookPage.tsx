@@ -86,7 +86,8 @@ export default function BookPage() {
 
         let wordCount = 0;
         chapters.forEach(c => {
-            wordCount += c.numOfWords ?? 0;
+            if (c.status === "Published")
+                wordCount += c.numOfWords ?? 0;
         })
         return wordCount;
     }
