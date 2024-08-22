@@ -67,11 +67,9 @@ function UserEdit() {
                     <p className="text-lg">{user?.lastName}</p>
                     <ImageUser base64={user?.profilePicBase64} />
 
-                    {file && <section>
-                        File details:
+                    {file && <section className="text-xs">
                         <ul>
                             <li>Name: {file.name}</li>
-                            <li>Type: {file.type}</li>
                             <li>Size: {file.size} bytes</li>
                         </ul>
                     </section>}
@@ -79,7 +77,7 @@ function UserEdit() {
 
                 <form className="flex flex-col my-2 gap-2">
                     <label>Upload File</label>
-                    <input type="file" onChange={handleSelectFile} />
+                    <input type="file" onChange={handleSelectFile} className="text-sm" />
 
                     {(progress && progress != 100) && <p>uploading... {progress}%</p>}
                     <div>

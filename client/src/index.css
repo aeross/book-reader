@@ -6,6 +6,11 @@
     padding: 2rem 5%;
 }
 
+.bg-orange-250 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(254 196 130 / var(--tw-bg-opacity))
+}
+
 .text-yellow-525 {
     --tw-text-opacity: 1;
     color: rgb(225 171 7 / var(--tw-text-opacity))

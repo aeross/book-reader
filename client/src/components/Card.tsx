@@ -15,8 +15,8 @@ function Card({ book }: { book: Book }) {
                     <Link to={`book/${book.id}`} className="font-semibold text-lg px-1 hover:underline">{book.title}</Link>
 
                     <div className="flex flex-wrap gap-1 my-[6px]">
-                        {book.genre && book.genre.split(",").map(genre => {
-                            return <span className="bg-orange-50 text-xs font-semibold shadow text-black text-opacity-70 rounded-full px-2 py-1">{genre}</span>
+                        {book.genre && book.genre.split(",").map((genre, i) => {
+                            return <span key={i} className="bg-orange-50 text-xs font-semibold shadow text-black text-opacity-70 rounded-full px-2 py-1">{genre}</span>
                         })}
                     </div>
 

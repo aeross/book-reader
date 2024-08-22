@@ -97,20 +97,26 @@ namespace BookReaderAPI.Controllers
         /// Uploads cover image file for the Book entity.
         /// </summary>
         [HttpPost("book/{bookId}")]
-        public IActionResult UploadBook(int bookId, [FromBody] Entities.File fReq)
+        public IActionResult UploadBook(int bookId, IFormFile file)
         {
             try
             {
                 int userId = Authenticate();
                 var book = AuthorizeBookAuthor(userId, bookId);
 
-                string base64 = fReq.Base64 ?? "";
-                if (string.IsNullOrEmpty(base64)) throw new BadRequestException("Base64 is required");
+                string base64 = "";
+                if (file.Length > 0)
+                {
+                    var memoryStream = new MemoryStream();
+                    file.CopyTo(memoryStream);
+                    base64 = Convert.ToBase64String(memoryStream.ToArray());
+                }
+                if (string.IsNullOrEmpty(base64)) throw new BadRequestException("File is required");
 
                 if (book!.CoverImgFileId == null || book!.CoverImgFileId == 0)
                 {
-                    var file = _context.Insert(new Entities.File { Base64 = base64 });
-                    var fileId = (file.First() as Entities.File)!.Id;
+                    var fileList = _context.Insert(new Entities.File { Base64 = base64 });
+                    var fileId = (fileList.First() as Entities.File)!.Id;
 
                     _context.ExecQuery(
                         Book.UpdateFile(), 

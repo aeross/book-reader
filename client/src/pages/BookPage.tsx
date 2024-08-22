@@ -14,10 +14,11 @@ export default function BookPage() {
     const { id } = useParams();
 
     const { user } = useAppSelector(state => state.user);
+    const [book, setBook] = useState<Book | null>();
 
     const [loading, setLoading] = useState(true);
 
-    const [book, setBook] = useState<Book | null>();
+    // const [book, setBook] = useState<Book | null>();
     const [authors, setAuthors] = useState<User[]>();
     const [chapters, setChapters] = useState<Chapter[]>([]);
 
@@ -90,6 +91,27 @@ export default function BookPage() {
         return wordCount;
     }
 
+    function getPublishedDate() {
+        // find the latest updatedAt with status = 'Published'
+        let published = false;
+        let mostRecentDate: Date = new Date(1970, 0, 1);
+        chapters.forEach(c => {
+            if (c.status === 'Published') {
+                if (!published) published = true;
+                if (new Date(c.updatedAt) > mostRecentDate) mostRecentDate = c.updatedAt;
+            }
+        });
+
+        if (published) {
+            return new Date(mostRecentDate).toLocaleDateString('en-EN', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+            });
+        }
+        return "Not published";
+    }
+
     // in minutes.
     function getEstimatedReadTime() {
         if (!chapters) return 0;
@@ -108,14 +130,16 @@ export default function BookPage() {
     }
 
     useEffect(() => {
-        (async () => {
-            await fetchBook();
-            await fetchChapters();
-            await fetchBookAuthors();
-            await incrementViews();
-            setLoading(false);
-        })();
-    }, [])
+        if (loading) {
+            (async () => {
+                await fetchBook();
+                await fetchChapters();
+                await fetchBookAuthors();
+                await incrementViews();
+                setLoading(false);
+            })();
+        }
+    }, [loading])
 
     if (loading) return <Loading message="Loading..." />
 
@@ -134,13 +158,13 @@ export default function BookPage() {
                             <p className="whitespace-pre-line">{book?.description}</p>
                         </div>
                         <div className="flex justify-between">
-                            <div className="">
+                            <div>
                                 <p className="mb-1 text-sm">
                                     Authored by: {authors?.map((author, i) => {
                                         if (author.username) {
                                             return ((i + 1) == authors.length)
-                                                ? <Link to={`/user/${author.username}`} className="hover:underline">@{author.username}</Link>
-                                                : <Link to={`/user/${author.username}`} className="hover:underline">@{author.username}, </Link>
+                                                ? <Link to={`/user/${author.username}`} key={i} className="hover:underline">@{author.username}</Link>
+                                                : <Link to={`/user/${author.username}`} key={i} className="hover:underline">@{author.username}, </Link>
                                         }
                                     })}
                                 </p>
@@ -164,23 +188,48 @@ export default function BookPage() {
                     <div className="col-span-2">
                         <h2 className="text-3xl font-bold pb-4 px-2 border-b">Chapters</h2>
                         {chapters.map(c => {
-                            return (
-                                <Link to="/">
-                                    <div className="text-lg border-b p-2 hover:bg-slate-100 flex justify-between [&>div]:hover:flex">
-                                        <span>{c.title}</span>
-                                        {checkIfUserIsAnAuthor() &&
-                                            <div className="hidden gap-4">
-                                                <span>
-                                                    <Link to={`/book/edit/${id}`}><FontAwesomeIcon icon={faEdit} className="opacity-60 hover:opacity-85" /></Link>
-                                                </span>
-                                                <span>
-                                                    <Link to={`/book/edit/${id}`}><FontAwesomeIcon icon={faTrash} className="opacity-60 hover:opacity-85" /></Link>
-                                                </span>
-                                            </div>
-                                        }
+                            if (c.status === "Draft")
+                                return (
+                                    <div key={c.id}>
+                                        <div className={`text-lg border-b border-b-red-800 p-2 flex justify-between ${checkIfUserIsAnAuthor() ? "[&>div#date]:hover:hidden" : ""} [&>div#links]:hover:flex text-black text-opacity-35 bg-red-800 bg-opacity-25 hover:cursor-not-allowed`}>
+                                            <span>{c.title}</span>
+                                            <div id="date" className="flex gap-4 text-sm items-center italic">Not published</div>
+                                            {checkIfUserIsAnAuthor() &&
+                                                <div id="links" className="hidden gap-4">
+                                                    <span>
+                                                        <Link to={`/book/edit/${id}`}><FontAwesomeIcon icon={faEdit} className="text-slate-600 hover:text-slate-900" /></Link>
+                                                    </span>
+                                                    <span>
+                                                        <Link to={`/book/edit/${id}`}><FontAwesomeIcon icon={faTrash} className="text-slate-600 hover:text-slate-900" /></Link>
+                                                    </span>
+                                                </div>
+                                            }
+                                        </div>
                                     </div>
-                                </Link>
-                            )
+                                )
+                            if (c.status === "Published")
+                                return (
+                                    <Link to="/" key={c.id}>
+                                        <div className={`text-lg border-b p-2 flex justify-between ${checkIfUserIsAnAuthor() ? "[&>div#date]:hover:hidden" : ""} [&>div#links]:hover:flex hover:bg-slate-100`}>
+                                            <span>{c.title}</span>
+                                            <div id="date" className="flex gap-4 text-sm items-center">{new Date(c.updatedAt).toLocaleDateString('en-EN', {
+                                                year: 'numeric',
+                                                month: 'long',
+                                                day: 'numeric',
+                                            })}</div>
+                                            {checkIfUserIsAnAuthor() &&
+                                                <div id="links" className="hidden gap-4">
+                                                    <span>
+                                                        <Link to={`/book/edit/${id}`}><FontAwesomeIcon icon={faEdit} className="opacity-60 hover:opacity-85" /></Link>
+                                                    </span>
+                                                    <span>
+                                                        <Link to={`/book/edit/${id}`}><FontAwesomeIcon icon={faTrash} className="opacity-60 hover:opacity-85" /></Link>
+                                                    </span>
+                                                </div>
+                                            }
+                                        </div>
+                                    </Link>
+                                )
                         })}
                     </div>
 
@@ -190,8 +239,8 @@ export default function BookPage() {
                             <div>
                                 <span className="font-semibold">Genre</span>
                                 <span className="flex flex-wrap gap-1">{
-                                    book?.genre && book?.genre.split(",").map(genre => {
-                                        return <span className="bg-orange-50 text-xs font-semibold shadow text-black text-opacity-85 rounded-full px-2 py-1">
+                                    book?.genre && book?.genre.split(",").map((genre, i) => {
+                                        return <span key={i} className="bg-orange-50 text-xs font-semibold shadow text-black text-opacity-85 rounded-full px-2 py-1">
                                             {genre}
                                         </span>
                                     })}
@@ -205,11 +254,7 @@ export default function BookPage() {
                                 <span className="font-semibold">
                                     Published on</span>
                                 <span>
-                                    {book?.updatedAt && new Date(book.updatedAt).toLocaleDateString('en-EN', {
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric',
-                                    })}
+                                    {getPublishedDate()}
                                 </span>
                             </div>
                         </div>
@@ -217,7 +262,7 @@ export default function BookPage() {
                         <h2 className="text-3xl font-bold mb-4">Contributors</h2>
                         {authors?.map(author => {
                             return (
-                                <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-4" key={author.id}>
                                     <Link to={`/user/${author.username}`}>
                                         <ImageUser base64={author?.profilePicBase64} size="xs" />
                                     </Link>
