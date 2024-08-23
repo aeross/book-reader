@@ -34,7 +34,7 @@ namespace BookReaderAPI.Controllers
                 var data = _context.GetById<Chapter>(id);
                 if (!data.Any()) throw new NotFoundException("Data not found");
 
-                var result = GetAPIResult(data);
+                var result = GetAPIResult(data.First());
                 return Ok(result);
             }
             catch (Exception e)

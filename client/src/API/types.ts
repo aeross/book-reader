@@ -15,6 +15,7 @@ export type Book = {
 export type Chapter = {
     id: number;
     title?: string;
+    content?: string;
     numOfWords?: number;
     status?: string;
     bookId: number;

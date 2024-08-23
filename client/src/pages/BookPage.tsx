@@ -8,19 +8,22 @@ import { faEdit, faEye, faThumbsUp, faTrash } from "@fortawesome/free-solid-svg-
 import { formatLargeNumber } from "../API/helper";
 import Loading from "../components/Loading";
 import ImageUser from "../components/ImageUser";
-import { useAppSelector } from "../store/configureStore";
+import { useAppDispatch, useAppSelector } from "../store/configureStore";
+import { setChapters } from "../store/chapterSlice";
 
 export default function BookPage() {
     const { id } = useParams();
+    const dispatch = useAppDispatch();
 
     const { user } = useAppSelector(state => state.user);
-    const [book, setBook] = useState<Book | null>();
 
     const [loading, setLoading] = useState(true);
 
-    // const [book, setBook] = useState<Book | null>();
+    const [book, setBook] = useState<Book | null>();
     const [authors, setAuthors] = useState<User[]>();
-    const [chapters, setChapters] = useState<Chapter[]>([]);
+
+    // chapters
+    const { chapters, chaptersLoaded } = useAppSelector(state => state.chapter);
 
     async function fetchBook() {
         try {
@@ -39,7 +42,7 @@ export default function BookPage() {
             const res = await agent.get<APIResponse<Chapter[]>>(`chapter/book/${id}`);
             const data = res.data.data;
             if (data) {
-                setChapters(data);
+                dispatch(setChapters({ chapters: data, chaptersLoaded: true }));
             }
         } catch (error) {
             console.log(error);
@@ -134,13 +137,13 @@ export default function BookPage() {
         if (loading) {
             (async () => {
                 await fetchBook();
-                await fetchChapters();
+                if (!chaptersLoaded) await fetchChapters();
                 await fetchBookAuthors();
                 await incrementViews();
                 setLoading(false);
             })();
         }
-    }, [loading])
+    }, [loading, chaptersLoaded])
 
     if (loading) return <Loading message="Loading..." />
 
@@ -188,7 +191,7 @@ export default function BookPage() {
                 <div className="grid grid-cols-3 mt-8 gap-10">
                     <div className="col-span-2">
                         <h2 className="text-3xl font-bold pb-4 px-2 border-b">Chapters</h2>
-                        {chapters.map(c => {
+                        {chapters.map((c, i) => {
                             if (c.status === "Draft")
                                 return (
                                     <div key={c.id}>
@@ -210,7 +213,7 @@ export default function BookPage() {
                                 )
                             if (c.status === "Published")
                                 return (
-                                    <Link to="/" key={c.id}>
+                                    <Link to={`chapter/${i + 1}`} key={c.id}>
                                         <div className={`text-lg border-b p-2 flex justify-between ${checkIfUserIsAnAuthor() ? "[&>div#date]:hover:hidden" : ""} [&>div#links]:hover:flex hover:bg-slate-100`}>
                                             <span>{c.title}</span>
                                             <div id="date" className="flex gap-4 text-sm items-center">{new Date(c.updatedAt).toLocaleDateString('en-EN', {
