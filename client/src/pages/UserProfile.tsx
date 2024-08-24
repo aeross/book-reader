@@ -6,6 +6,8 @@ import { Link, useParams } from "react-router-dom";
 import { formatLargeNumber } from "../API/helper";
 import { useAppSelector } from "../store/configureStore";
 import Button from "../components/Button";
+import { faEdit } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function UserProfile() {
     const { username } = useParams();
@@ -84,8 +86,8 @@ function UserProfile() {
                         </div>
                     </div>
                     {currUser?.username === username &&
-                        <Link to={`/user/edit/${username}`} className="mt-4 mr-0 ml-auto px-[19%]">
-                            <Button text="Edit Profile" />
+                        <Link to={`/user/edit/${username}`} className="mt-4 mr-0 ml-auto px-[20%]">
+                            <FontAwesomeIcon icon={faEdit} className="text-xl hover:opacity-85 opacity-60" />
                         </Link>
                     }
                 </div>
