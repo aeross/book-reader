@@ -10,6 +10,7 @@ import Loading from "../components/Loading";
 import ImageUser from "../components/ImageUser";
 import { useAppDispatch, useAppSelector } from "../store/configureStore";
 import { setChapters } from "../store/chapterSlice";
+import Button from "../components/Button";
 
 export default function BookPage() {
     const { id } = useParams();
@@ -279,6 +280,10 @@ export default function BookPage() {
                                 </div>
                             )
                         })}
+
+                        <div className="w-full">
+                            <Button text="Add to readlist" />
+                        </div>
                     </div>
 
 
