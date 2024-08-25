@@ -30,7 +30,7 @@ function Card({ book }: { book: Book }) {
 
                 <div className="flex justify-between text-sm px-1">
                     <div></div>
-                    <Link to={`book/${book.id}`} className="flex justify-center items-center shadow rounded-full bg-orange-50 p-2 w-7 h-7 hover:bg-orange-100 hover:opacity-85">
+                    <Link to={`/book/${book.id}`} className="flex justify-center items-center shadow rounded-full bg-orange-50 p-2 w-7 h-7 hover:bg-orange-100 hover:opacity-85">
                         <FontAwesomeIcon icon={faInfo} className="opacity-60" />
                     </Link>
                 </div>

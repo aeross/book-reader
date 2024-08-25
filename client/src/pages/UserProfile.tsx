@@ -5,9 +5,9 @@ import { APIResponse, Book, User } from "../API/types";
 import { Link, useParams } from "react-router-dom";
 import { formatLargeNumber } from "../API/helper";
 import { useAppSelector } from "../store/configureStore";
-import Button from "../components/Button";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Card from "../components/Card";
 
 function UserProfile() {
     const { username } = useParams();
@@ -78,7 +78,7 @@ function UserProfile() {
                                 <span className="font-semibold">Books Authored</span><span>{booksUser.length}</span>
                             </p>
                             <p className="flex justify-between">
-                                <span className="font-semibold">Member Since</span><span>{user && new Date(user.updatedAt).toLocaleDateString('en-EN', {
+                                <span className="font-semibold">Member Since</span><span>{user && new Date(user.createdAt).toLocaleDateString('en-EN', {
                                     year: 'numeric',
                                     month: 'long',
                                     day: 'numeric',
@@ -93,12 +93,10 @@ function UserProfile() {
                 </div>
 
                 <h2 className="text-3xl font-bold mb-4 mt-6">Books</h2>
-                <div className="pt-4 grid grid-cols-[1fr_2fr] rounded">
-                    <div>
-                        {booksUser.map(book => {
-                            return <div key={book.id}>{book.title}</div>
-                        })}
-                    </div>
+                <div className="grid grid-cols-5 gap-5">
+                    {booksUser.map(book => {
+                        return <Card key={book.id} book={book} />
+                    })}
                 </div>
             </div>
         </>

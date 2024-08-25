@@ -19,6 +19,7 @@ export const router = createBrowserRouter([
             { path: '/register', element: <Register /> },
             { path: '/user', element: <UserEdit /> },
             { path: '/user/:username', element: <UserProfile /> },
+            { path: '/user/edit/:username', element: <UserEdit /> },
             { path: '/book/:id', element: <BookPage /> },
             { path: '/book/edit/:id', element: <BookEdit /> },
             { path: '/book/:bookId/chapter/:chapterId', element: <ChapterPage /> }
