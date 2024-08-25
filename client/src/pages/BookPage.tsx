@@ -202,10 +202,14 @@ export default function BookPage() {
                                             {checkIfUserIsAnAuthor() &&
                                                 <div id="links" className="hidden gap-4">
                                                     <span>
-                                                        <Link to={`/book/edit/${id}`}><FontAwesomeIcon icon={faEdit} className="text-slate-600 hover:text-slate-900" /></Link>
+                                                        <Link to={`/book/${id}/chapter/edit/${i + 1}`}>
+                                                            <FontAwesomeIcon icon={faEdit} className="text-slate-600 hover:text-slate-900" />
+                                                        </Link>
                                                     </span>
                                                     <span>
-                                                        <Link to={`/book/edit/${id}`}><FontAwesomeIcon icon={faTrash} className="text-slate-600 hover:text-slate-900" /></Link>
+                                                        <Link to={`/book/${id}/chapter/edit/${i + 1}`}>
+                                                            <FontAwesomeIcon icon={faTrash} className="text-slate-600 hover:text-slate-900" />
+                                                        </Link>
                                                     </span>
                                                 </div>
                                             }
@@ -225,10 +229,14 @@ export default function BookPage() {
                                             {checkIfUserIsAnAuthor() &&
                                                 <div id="links" className="hidden gap-4">
                                                     <span>
-                                                        <Link to={`/book/edit/${id}`}><FontAwesomeIcon icon={faEdit} className="opacity-60 hover:opacity-85" /></Link>
+                                                        <Link to={`/book/${id}/chapter/edit/${i + 1}`}>
+                                                            <FontAwesomeIcon icon={faEdit} className="opacity-60 hover:opacity-85" />
+                                                        </Link>
                                                     </span>
                                                     <span>
-                                                        <Link to={`/book/edit/${id}`}><FontAwesomeIcon icon={faTrash} className="opacity-60 hover:opacity-85" /></Link>
+                                                        <Link to={`/book/${id}/chapter/edit/${i + 1}`}>
+                                                            <FontAwesomeIcon icon={faTrash} className="opacity-60 hover:opacity-85" />
+                                                        </Link>
                                                     </span>
                                                 </div>
                                             }

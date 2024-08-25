@@ -8,6 +8,7 @@ import UserProfile from "./UserProfile";
 import UserEdit from "./UserEdit";
 import BookEdit from "./BookEdit";
 import ChapterPage from "./ChapterPage";
+import ChapterEdit from "./ChapterEdit";
 
 export const router = createBrowserRouter([
     {
@@ -22,7 +23,8 @@ export const router = createBrowserRouter([
             { path: '/user/edit/:username', element: <UserEdit /> },
             { path: '/book/:id', element: <BookPage /> },
             { path: '/book/edit/:id', element: <BookEdit /> },
-            { path: '/book/:bookId/chapter/:chapterId', element: <ChapterPage /> }
+            { path: '/book/:bookId/chapter/:chapterId', element: <ChapterPage /> },
+            { path: '/book/:bookId/chapter/edit/:chapterId', element: <ChapterEdit /> }
         ]
     },
 ])
