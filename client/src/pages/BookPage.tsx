@@ -5,7 +5,7 @@ import { Link, useParams } from "react-router-dom";
 import ImageBook from "../components/ImageBook";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faEye, faThumbsUp, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { formatLargeNumber } from "../API/helper";
+import { checkIfUserIsAnAuthor, formatLargeNumber } from "../API/helper";
 import Loading from "../components/Loading";
 import ImageUser from "../components/ImageUser";
 import { useAppDispatch, useAppSelector } from "../store/configureStore";
@@ -68,21 +68,6 @@ export default function BookPage() {
         } catch (error) {
             console.log(error);
         }
-    }
-
-    function checkIfUserIsAnAuthor() {
-        if (!authors) return false;
-        if (!user) return false;
-
-        let output = false;
-        for (let i = 0; i < authors.length; i++) {
-            let author = authors[i];
-            if (author.username === user.username) {
-                output = true;
-                break;
-            }
-        }
-        return output;
     }
 
     function getWordCount() {
@@ -181,7 +166,7 @@ export default function BookPage() {
                                 </div>
                             </div>
                             <span className="flex items-end">
-                                {checkIfUserIsAnAuthor() &&
+                                {checkIfUserIsAnAuthor(authors, user) &&
                                     <Link to={`/book/edit/${id}`}><FontAwesomeIcon icon={faEdit} className="opacity-60 text-2xl hover:opacity-85" /></Link>
                                 }
                             </span>
@@ -196,10 +181,10 @@ export default function BookPage() {
                             if (c.status === "Draft")
                                 return (
                                     <div key={c.id}>
-                                        <div className={`text-lg border-b border-b-red-800 p-2 flex justify-between ${checkIfUserIsAnAuthor() ? "[&>div#date]:hover:hidden" : ""} [&>div#links]:hover:flex text-black text-opacity-35 bg-red-800 bg-opacity-25 hover:cursor-not-allowed`}>
+                                        <div className={`text-lg border-b border-b-red-800 p-2 flex justify-between ${checkIfUserIsAnAuthor(authors, user) ? "[&>div#date]:hover:hidden" : ""} [&>div#links]:hover:flex text-black text-opacity-35 bg-red-800 bg-opacity-25 hover:cursor-not-allowed`}>
                                             <span>{c.title}</span>
                                             <div id="date" className="flex gap-4 text-sm items-center italic">Not published</div>
-                                            {checkIfUserIsAnAuthor() &&
+                                            {checkIfUserIsAnAuthor(authors, user) &&
                                                 <div id="links" className="hidden gap-4">
                                                     <span>
                                                         <Link to={`/book/${id}/chapter/edit/${i + 1}`}>
@@ -219,14 +204,14 @@ export default function BookPage() {
                             if (c.status === "Published")
                                 return (
                                     <Link to={`chapter/${i + 1}`} key={c.id}>
-                                        <div className={`text-lg border-b p-2 flex justify-between ${checkIfUserIsAnAuthor() ? "[&>div#date]:hover:hidden" : ""} [&>div#links]:hover:flex hover:bg-slate-100`}>
+                                        <div className={`text-lg border-b p-2 flex justify-between ${checkIfUserIsAnAuthor(authors, user) ? "[&>div#date]:hover:hidden" : ""} [&>div#links]:hover:flex hover:bg-slate-100`}>
                                             <span>{c.title}</span>
                                             <div id="date" className="flex gap-4 text-sm items-center">{new Date(c.updatedAt).toLocaleDateString('en-EN', {
                                                 year: 'numeric',
                                                 month: 'long',
                                                 day: 'numeric',
                                             })}</div>
-                                            {checkIfUserIsAnAuthor() &&
+                                            {checkIfUserIsAnAuthor(authors, user) &&
                                                 <div id="links" className="hidden gap-4">
                                                     <span>
                                                         <Link to={`/book/${id}/chapter/edit/${i + 1}`}>

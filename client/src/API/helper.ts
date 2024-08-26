@@ -1,3 +1,5 @@
+import { User } from "./types";
+
 export function formatLargeNumber(n: number) {
     let nStr = n.toString();
 
@@ -12,4 +14,19 @@ export function formatLargeNumber(n: number) {
     }
 
     return nStr;
+}
+
+export function checkIfUserIsAnAuthor(authors?: User[] | null, user?: User | null) {
+    if (!authors) return false;
+    if (!user) return false;
+
+    let output = false;
+    for (let i = 0; i < authors.length; i++) {
+        let author = authors[i];
+        if (author.username === user.username) {
+            output = true;
+            break;
+        }
+    }
+    return output;
 }
