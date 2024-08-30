@@ -37,6 +37,7 @@ namespace BookReaderAPI.Controllers
                     {
                         base64 = GetBase64((int)book.cover_img_file_id);
                     }
+                    Console.WriteLine((string)book.id);
 
                     booksDTO.Add(new BookDTO
                     {
