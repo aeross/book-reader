@@ -9,7 +9,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfo } from "@fortawesome/free-solid-svg-icons";
 import { checkIfUserIsAnAuthor } from "../API/helper";
 import ChapterView from "../components/ChapterView";
-import ReactQuill from "react-quill";
+import { useQuill } from "react-quilljs";
+import 'quill/dist/quill.snow.css';
 
 export default function ChapterEdit() {
     const { bookId, chapterId } = useParams();
@@ -28,6 +29,7 @@ export default function ChapterEdit() {
     // auto resize textarea & auto scroll when input is out of frame
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     // const [contentVal, setContentVal] = useState("");
+    const { quill, quillRef } = useQuill();
 
     // fetches
     async function fetchChapters() {
@@ -93,7 +95,7 @@ export default function ChapterEdit() {
     if (!chaptersLoaded) return <Loading message="Loading..." />
 
     return (
-        <div className="bg-gray-200 outer container min-h-full">
+        <div className="bg-gray-200 outer container min-h-screen">
             <div className="grid grid-cols-[2fr_5fr_2fr]">
 
                 {preview
@@ -128,7 +130,7 @@ export default function ChapterEdit() {
                                     type="text" onChange={(e) => { setChapter({ ...chapter!, title: e.target.value }) }}
                                     className="w-full mb-6 text-center font-semibold text-2xl rounded-lg focus:outline-none" value={chapter ? chapter.title : ""} />
                             </div>
-                            <textarea
+                            {/* <textarea
                                 ref={textareaRef}
                                 id="autoResizeTextarea"
                                 onChange={(e) => {
@@ -137,7 +139,8 @@ export default function ChapterEdit() {
                                 }}
                                 value={chapter ? chapter.content : ""}
                                 className="w-full resize-none overflow-hidden text-justify rounded-lg focus:outline-none"
-                            />
+                            /> */}
+                            <div ref={quillRef}>{chapter?.content}</div>
                         </form>
                     </>
                 }
