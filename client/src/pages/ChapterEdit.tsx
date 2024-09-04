@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfo } from "@fortawesome/free-solid-svg-icons";
 import { checkIfUserIsAnAuthor } from "../API/helper";
 import ChapterView from "../components/ChapterView";
+import ReactQuill from "react-quill";
 
 export default function ChapterEdit() {
     const { bookId, chapterId } = useParams();
@@ -26,7 +27,7 @@ export default function ChapterEdit() {
 
     // auto resize textarea & auto scroll when input is out of frame
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const [contentVal, setContentVal] = useState("");
+    // const [contentVal, setContentVal] = useState("");
 
     // fetches
     async function fetchChapters() {
@@ -47,7 +48,7 @@ export default function ChapterEdit() {
             const data = res.data.data;
             if (data) {
                 setChapter(data);
-                if (data.content) setContentVal(data.content);
+                // if (data.content) setContentVal(data.content);
             }
         } catch (error) {
             console.log(error);
@@ -66,16 +67,14 @@ export default function ChapterEdit() {
         }
     }
 
-    console.log(contentVal);
-
     useEffect(() => {
         const textarea = textareaRef.current;
 
         if (textarea) {
-            textarea.style.height = 'auto'; // Reset height to auto to get the correct scrollHeight
+            // textarea.style.height = 'auto'; // Reset height to auto to get the correct scrollHeight
             textarea.style.height = `${textarea.scrollHeight}px`; // Set height based on scrollHeight
         }
-    }, [contentVal]); // Re-run effect when value changes
+    }, [textareaRef.current, chapter?.content]); // Re-run effect when value changes
 
     useEffect(() => {
         fetchBookAuthors();
@@ -133,7 +132,7 @@ export default function ChapterEdit() {
                                 ref={textareaRef}
                                 id="autoResizeTextarea"
                                 onChange={(e) => {
-                                    setContentVal(e.target.value);
+                                    // setContentVal(e.target.value);
                                     setChapter({ ...chapter!, content: e.target.value });
                                 }}
                                 value={chapter ? chapter.content : ""}
