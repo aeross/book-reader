@@ -10,6 +10,7 @@ import { faInfo } from "@fortawesome/free-solid-svg-icons";
 import { checkIfUserIsAnAuthor } from "../API/helper";
 import ChapterView from "../components/ChapterView";
 import { ContentState, Editor, EditorState } from 'draft-js';
+import { convertFromRaw, convertToRaw } from 'draft-js';
 import 'draft-js/dist/Draft.css';
 
 export default function ChapterEdit() {
@@ -19,19 +20,12 @@ export default function ChapterEdit() {
         chapterNum = parseInt(chapterId);
     }
 
-
     const dispatch = useAppDispatch();
     const { chapters, chaptersLoaded } = useAppSelector(state => state.chapter);
     const { user } = useAppSelector(state => state.user);
     const [authors, setAuthors] = useState<User[]>();
     const [chapter, setChapter] = useState<Chapter | null>();
 
-    // auto resize textarea & auto scroll when input is out of frame
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
-    // const [contentVal, setContentVal] = useState("");
-    const [editorState, setEditorState] = useState(() =>
-        EditorState.createEmpty(),
-    );
 
     // fetches
     async function fetchChapters() {
@@ -55,7 +49,7 @@ export default function ChapterEdit() {
                 if (data.content) {
                     setEditorState(() =>
                         EditorState.createWithContent(
-                            ContentState.createFromText(data.content!)
+                            convertFromRaw(JSON.parse(data.content!))
                         ));
                 }
             }
@@ -77,15 +71,6 @@ export default function ChapterEdit() {
     }
 
     useEffect(() => {
-        const textarea = textareaRef.current;
-
-        if (textarea) {
-            // textarea.style.height = 'auto'; // Reset height to auto to get the correct scrollHeight
-            textarea.style.height = `${textarea.scrollHeight}px`; // Set height based on scrollHeight
-        }
-    }, [textareaRef.current, chapter?.content]); // Re-run effect when value changes
-
-    useEffect(() => {
         fetchBookAuthors();
     }, [])
 
@@ -94,9 +79,25 @@ export default function ChapterEdit() {
         if (chaptersLoaded) fetchChapter();
     }, [chaptersLoaded])
 
-    useEffect(() => {
-        console.log(editorState.getCurrentContent().getPlainText());
-    }, [editorState])
+
+    // rich text editor
+    const [editorState, setEditorState] = useState(() =>
+        EditorState.createEmpty(),
+    );
+
+    async function saveDraft() {
+        try {
+            if (chapter) {
+                const content = JSON.stringify(convertToRaw(editorState.getCurrentContent()));
+                const updatedChapter = { ...chapter, content }
+                console.log(updatedChapter);
+
+                await agent.put(`chapter/${chapter.id}`, updatedChapter);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     // handle preview mode
     const [preview, setPreview] = useState(false);
@@ -142,20 +143,12 @@ export default function ChapterEdit() {
                                     className="w-full mb-6 text-center font-semibold text-2xl rounded-lg focus:outline-none" value={chapter ? chapter.title : ""} />
                             </div>
                             <Editor
-                                // ref={textareaRef}
-                                // onChange={(e) => {
-                                //     setChapter({ ...chapter!, content: e.target.value });
-                                // }}
                                 editorState={editorState}
                                 onChange={setEditorState}
-                            // value={chapter ? chapter.content : ""}
-                            // className="w-full resize-none overflow-hidden text-justify rounded-lg focus:outline-none"
                             />
                         </form>
                     </>
                 }
-
-
 
                 {preview
                     ?
@@ -181,7 +174,7 @@ export default function ChapterEdit() {
                         </div>
                         <div className="flex justify-between">
                             <Link to={`/book/${bookId}`} className="hover:underline text-sm">Exit</Link>
-                            <Link to="" className="hover:underline text-sm">Save</Link>
+                            <button onClick={saveDraft} className="hover:underline text-sm">Save</button>
                         </div>
                     </div>
                 }
