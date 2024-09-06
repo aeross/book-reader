@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../store/configureStore"
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { APIResponse, Chapter, User } from "../API/types";
 import agent from "../API/axios";
 import { setChapters } from "../store/chapterSlice";
@@ -9,8 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfo } from "@fortawesome/free-solid-svg-icons";
 import { checkIfUserIsAnAuthor } from "../API/helper";
 import ChapterView from "../components/ChapterView";
-import { ContentState, Editor, EditorState } from 'draft-js';
-import { convertFromRaw, convertToRaw } from 'draft-js';
+import { Editor, EditorState, RichUtils, convertFromRaw, convertToRaw } from 'draft-js';
 import 'draft-js/dist/Draft.css';
 
 export default function ChapterEdit() {
@@ -79,6 +78,8 @@ export default function ChapterEdit() {
         if (chaptersLoaded) fetchChapter();
     }, [chaptersLoaded])
 
+    // handle preview mode
+    const [preview, setPreview] = useState(false);
 
     // rich text editor
     const [editorState, setEditorState] = useState(() =>
@@ -99,12 +100,18 @@ export default function ChapterEdit() {
         }
     }
 
-    // handle preview mode
-    const [preview, setPreview] = useState(false);
+    // text styling
+    const toggleInlineStyle = (event: React.FormEvent) => {
+        event.preventDefault();
+        let style = event.currentTarget.getAttribute('data-style');
+        if (style)
+            setEditorState(RichUtils.toggleInlineStyle(editorState, style));
+    };
 
-    if (!checkIfUserIsAnAuthor(authors, user)) return <div>Oops... we could not find what you are looking for.</div>
 
     if (!chaptersLoaded) return <Loading message="Loading..." />
+
+    if (!checkIfUserIsAnAuthor(authors, user)) return <div>Oops... we could not find what you are looking for.</div>
 
     return (
         <div className="bg-gray-200 outer container min-h-screen">
@@ -118,24 +125,33 @@ export default function ChapterEdit() {
                     </>
                     :
                     <>
-                        <div className="bg-white rounded-lg p-4 mr-2 flex flex-col justify-between gap-2 h-32">
+                        <div className="sticky top-[108px] h-[calc(100dvh-4rem-78px)] bg-white rounded-lg p-4 mr-2 flex flex-col justify-between gap-2 text-sm">
                             <form className="flex flex-col justify-between h-full">
-                                <div>
-                                    <label htmlFor="type">Type</label>
-                                    <select id="type" className="ml-8 pl-[2px] border-b text-black text-opacity-60 pr-2 py-[1px] text-sm active:outline-none focus:outline-none cursor-pointer">
-                                        <option value="Text">Text</option>
-                                        <option value="Markdown">Markdown</option>
-                                    </select>
+                                <div className="flex flex-col gap-4">
+                                    <section>
+                                        <label htmlFor="type">Type</label>
+                                        <select id="type" className="ml-8 pl-[2px] border-b text-black text-opacity-60 pr-2 py-[1px] active:outline-none focus:outline-none cursor-pointer">
+                                            <option value="Text">Text</option>
+                                            <option value="Markdown">Markdown</option>
+                                        </select>
+                                    </section>
+
+                                    <section>
+                                        <label htmlFor="">Font</label>
+                                        <input
+                                            type="button"
+                                            value="Bold"
+                                            data-style="BOLD"
+                                            onMouseDown={toggleInlineStyle}
+                                        />
+                                    </section>
+
                                 </div>
 
-                                <div className="flex justify-center">
-                                    <button onClick={(e) => {
-                                        e.preventDefault();
-                                        setPreview(true)
-                                    }} className="hover:underline text-sm">Preview</button>
-                                </div>
+                                <button onClick={saveDraft} className="hover:underline text-sm">Save</button>
                             </form>
                         </div>
+
                         <form className="text-justify bg-white rounded-lg p-4 pt-6">
                             <div className="flex justify-center items-center">
                                 <input
@@ -145,6 +161,7 @@ export default function ChapterEdit() {
                             <Editor
                                 editorState={editorState}
                                 onChange={setEditorState}
+                                textAlignment="center"
                             />
                         </form>
                     </>
@@ -152,7 +169,7 @@ export default function ChapterEdit() {
 
                 {preview
                     ?
-                    <div className="bg-white rounded-lg p-4 ml-2 flex flex-col justify-between gap-2 h-32">
+                    <div className="sticky top-[108px] bg-white rounded-lg p-4 ml-2 flex flex-col justify-between gap-2 h-32">
                         <div className="flex gap-3 items-center">
                             <div className="w-7 h-7 bg-gray-300 rounded-full flex justify-center items-center translate-y-1">
                                 <FontAwesomeIcon icon={faInfo} className="w-2/3 h-2/3 font-bold text-black text-opacity-75" />
@@ -165,7 +182,7 @@ export default function ChapterEdit() {
                         </div>
                     </div>
                     :
-                    <div className="bg-white rounded-lg p-4 ml-2 flex flex-col justify-between gap-2 h-32">
+                    <div className="sticky top-[108px] bg-white rounded-lg p-4 ml-2 flex flex-col justify-between gap-2 h-32">
                         <div className="flex gap-3 items-center">
                             <div className="w-7 h-7 bg-gray-300 rounded-full flex justify-center items-center translate-y-1">
                                 <FontAwesomeIcon icon={faInfo} className="w-2/3 h-2/3 font-bold text-black text-opacity-75" />
@@ -174,7 +191,12 @@ export default function ChapterEdit() {
                         </div>
                         <div className="flex justify-between">
                             <Link to={`/book/${bookId}`} className="hover:underline text-sm">Exit</Link>
-                            <button onClick={saveDraft} className="hover:underline text-sm">Save</button>
+                            <div className="flex justify-center">
+                                <button onClick={(e) => {
+                                    e.preventDefault();
+                                    setPreview(true)
+                                }} className="hover:underline text-sm">Preview</button>
+                            </div>
                         </div>
                     </div>
                 }
