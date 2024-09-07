@@ -1,5 +1,6 @@
 import { faCircleLeft, faCircleRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Editor, EditorState } from "draft-js";
 import { Link } from "react-router-dom";
 
 interface Props {
@@ -8,6 +9,8 @@ interface Props {
     chapterNum?: string | number;
     chapterTitle?: string;
     chapterContent?: string;
+    editorState?: EditorState;
+    setEditorState?: React.Dispatch<React.SetStateAction<EditorState>>;
     getPrevChapterNum?: () => number | null;
     getNextChapterNum?: () => number | null;
     handleChapterChange?: () => void;
@@ -19,6 +22,8 @@ export default function ChapterView({
     chapterNum,
     chapterTitle,
     chapterContent,
+    editorState,
+    setEditorState,
     getPrevChapterNum,
     getNextChapterNum,
     handleChapterChange,
@@ -33,7 +38,13 @@ export default function ChapterView({
             }
 
             <h1 className="mt-6 mb-6 text-center font-semibold text-2xl">{chapterTitle}</h1>
-            <p>{chapterContent}</p>
+            {editorState && setEditorState &&
+                <Editor
+                    editorState={editorState}
+                    onChange={setEditorState}
+                    readOnly={true}
+                />
+            }
 
             {getPrevChapterNum && getNextChapterNum && handleChapterChange && chapterNum &&
                 <div className="flex justify-between items-center mt-6 border-t pt-2">

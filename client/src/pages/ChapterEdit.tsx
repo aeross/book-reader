@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAlignCenter, faAlignJustify, faAlignLeft, faAlignRight, faBold, faCode, faInfo, faItalic, faListNumeric, faListUl, faRedo, faStrikethrough, faSubscript, faSuperscript, faUnderline, faUndo } from "@fortawesome/free-solid-svg-icons";
 import { checkIfUserIsAnAuthor } from "../API/helper";
 import ChapterView from "../components/ChapterView";
-import { Editor, EditorState, RichUtils, convertFromRaw, convertToRaw } from 'draft-js';
+import { Editor, EditorState, RichUtils, convertFromRaw, convertToRaw, DraftStyleMap } from 'draft-js';
 import 'draft-js/dist/Draft.css';
 
 export default function ChapterEdit() {
@@ -104,13 +104,25 @@ export default function ChapterEdit() {
     const toggleRichTextStyle = (event: React.FormEvent) => {
         event.preventDefault();
         let style = event.currentTarget.getAttribute('data-style');
-        if (style)
+        if (style) {
             setEditorState(RichUtils.toggleInlineStyle(editorState, style));
+        }
 
         let block = event.currentTarget.getAttribute('data-block');
         if (block)
             setEditorState(RichUtils.toggleBlockType(editorState, block));
     };
+
+    const customStyles: DraftStyleMap = {
+        'SUBSCRIPT': {
+            fontSize: '0.75em',
+            verticalAlign: 'sub',
+        },
+        'SUPERSCRIPT': {
+            fontSize: '0.75em',
+            verticalAlign: 'super',
+        },
+    }
 
     // check if styling is active
     const renderInlineStyle = (style: string) => {
@@ -144,7 +156,7 @@ export default function ChapterEdit() {
                     ?
                     <>
                         <div></div>
-                        <ChapterView chapterTitle={chapter?.title} chapterContent={chapter?.content} />
+                        <ChapterView chapterTitle={chapter?.title} editorState={editorState} setEditorState={setEditorState} />
                         <div className="sticky top-[108px] bg-white rounded-lg p-4 ml-2 flex flex-col justify-between gap-2 h-32">
 
                             <div className="flex gap-3 items-center">
@@ -224,36 +236,34 @@ export default function ChapterEdit() {
                                     </section>
 
                                     <section className="grid grid-cols-5 gap-4 ml-1 mr-4">
-                                        <FontAwesomeIcon className={`${renderBlockStyle("header-one")} hover:cursor-pointer`} icon={faUndo}
-                                            data-block="header-one"
-                                            onMouseDown={toggleRichTextStyle}
+                                        <FontAwesomeIcon className={`hover:cursor-pointer`} icon={faUndo}
+                                            onMouseDown={() => setEditorState(EditorState.undo(editorState))}
                                         />
                                         <FontAwesomeIcon className={`${renderBlockStyle("header-two")} hover:cursor-pointer`} icon={faRedo}
-                                            data-block="header-two"
+                                            onMouseDown={() => setEditorState(EditorState.redo(editorState))}
+                                        />
+                                        <FontAwesomeIcon className={`${renderBlockStyle("ALIGN-LEFT")} hover:cursor-pointer`} icon={faAlignLeft}
+                                            data-block="ALIGN-LEFT"
                                             onMouseDown={toggleRichTextStyle}
                                         />
-                                        <FontAwesomeIcon className={`${renderBlockStyle("header-three")} hover:cursor-pointer`} icon={faAlignLeft}
-                                            data-block="header-three"
+                                        <FontAwesomeIcon className={`${renderBlockStyle("ALIGN-CENTER")} hover:cursor-pointer`} icon={faAlignCenter}
+                                            data-block="ALIGN-CENTER"
                                             onMouseDown={toggleRichTextStyle}
                                         />
-                                        <FontAwesomeIcon className={`${renderBlockStyle("header-four")} hover:cursor-pointer`} icon={faAlignCenter}
-                                            data-block="header-four"
+                                        <FontAwesomeIcon className={`${renderBlockStyle("ALIGN-RIGHT")} hover:cursor-pointer`} icon={faAlignRight}
+                                            data-block="ALIGN-RIGHT"
                                             onMouseDown={toggleRichTextStyle}
                                         />
-                                        <FontAwesomeIcon className={`${renderBlockStyle("header-five")} hover:cursor-pointer`} icon={faAlignRight}
-                                            data-block="header-five"
+                                        <FontAwesomeIcon className={`${renderBlockStyle("ALIGN-JUSTIFY")} hover:cursor-pointer`} icon={faAlignJustify}
+                                            data-block="ALIGN-JUSTIFY"
                                             onMouseDown={toggleRichTextStyle}
                                         />
-                                        <FontAwesomeIcon className={`${renderBlockStyle("blockquote")} hover:cursor-pointer`} icon={faAlignJustify}
-                                            data-block="blockquote"
+                                        <FontAwesomeIcon className={`${renderInlineStyle("SUBSCRIPT")} hover:cursor-pointer`} icon={faSubscript}
+                                            data-style="SUBSCRIPT"
                                             onMouseDown={toggleRichTextStyle}
                                         />
-                                        <FontAwesomeIcon className={`${renderBlockStyle("blockquote")} hover:cursor-pointer`} icon={faSuperscript}
-                                            data-block="blockquote"
-                                            onMouseDown={toggleRichTextStyle}
-                                        />
-                                        <FontAwesomeIcon className={`${renderBlockStyle("blockquote")} hover:cursor-pointer`} icon={faSubscript}
-                                            data-block="blockquote"
+                                        <FontAwesomeIcon className={`${renderInlineStyle("SUPERSCRIPT")} hover:cursor-pointer`} icon={faSuperscript}
+                                            data-style="SUPERSCRIPT"
                                             onMouseDown={toggleRichTextStyle}
                                         />
                                     </section>
@@ -271,6 +281,7 @@ export default function ChapterEdit() {
                                     className="w-full mb-6 text-center font-semibold text-2xl rounded-lg focus:outline-none" value={chapter ? chapter.title : ""} />
                             </div>
                             <Editor
+                                customStyleMap={customStyles}
                                 editorState={editorState}
                                 onChange={setEditorState}
                                 textAlignment="left"
