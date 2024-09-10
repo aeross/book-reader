@@ -6,8 +6,8 @@ import agent from "../API/axios";
 import { setChapters } from "../store/chapterSlice";
 import Loading from "../components/Loading";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAlignCenter, faAlignJustify, faAlignLeft, faAlignRight, faBold, faCode, faInfo, faItalic, faListNumeric, faListUl, faRedo, faStrikethrough, faSubscript, faSuperscript, faUnderline, faUndo } from "@fortawesome/free-solid-svg-icons";
-import { checkIfUserIsAnAuthor } from "../API/helper";
+import { faBold, faCode, faInfo, faItalic, faListNumeric, faListUl, faRedo, faStrikethrough, faSubscript, faSuperscript, faUnderline, faUndo } from "@fortawesome/free-solid-svg-icons";
+import { checkIfUserIsAnAuthor, getWordCountFromPlainText } from "../API/helper";
 import ChapterView from "../components/ChapterView";
 import { Editor, EditorState, RichUtils, convertFromRaw, convertToRaw, DraftStyleMap } from 'draft-js';
 import 'draft-js/dist/Draft.css';
@@ -143,6 +143,10 @@ export default function ChapterEdit() {
         return active;
     }
 
+    // helpers
+    const getCharCount = () => editorState.getCurrentContent().getPlainText().length;
+    const getWordCount = () => getWordCountFromPlainText(editorState.getCurrentContent().getPlainText());
+
 
     if (!chaptersLoaded) return <Loading message="Loading..." />
 
@@ -184,88 +188,72 @@ export default function ChapterEdit() {
                                         </select>
                                     </section>
 
-                                    <section>
-                                        <span className="mr-4">Font</span>
+
+
+
+
+                                    <section className="grid grid-cols-5 gap-1 ml-1 mr-4 mt-2">
                                         <FontAwesomeIcon
-                                            className={`${renderInlineStyle("BOLD")} ml-4 hover:cursor-pointer`} icon={faBold}
+                                            className={`${renderInlineStyle("BOLD")} ml-[3px] hover:cursor-pointer`} icon={faBold}
                                             data-style="BOLD"
                                             onMouseDown={toggleRichTextStyle}
                                         />
                                         <FontAwesomeIcon
-                                            className={`${renderInlineStyle("ITALIC")} ml-5 hover:cursor-pointer`} icon={faItalic}
+                                            className={`${renderInlineStyle("ITALIC")} ml-[2px] hover:cursor-pointer`} icon={faItalic}
                                             data-style="ITALIC"
                                             onMouseDown={toggleRichTextStyle}
                                         />
                                         <FontAwesomeIcon
-                                            className={`${renderInlineStyle("UNDERLINE")} ml-5 hover:cursor-pointer`} icon={faUnderline}
+                                            className={`${renderInlineStyle("UNDERLINE")} ml-[2px] hover:cursor-pointer`} icon={faUnderline}
                                             data-style="UNDERLINE"
                                             onMouseDown={toggleRichTextStyle}
                                         />
                                         <FontAwesomeIcon
-                                            className={`${renderInlineStyle("STRIKETHROUGH")} ml-5 hover:cursor-pointer`} icon={faStrikethrough}
+                                            className={`${renderInlineStyle("STRIKETHROUGH")} hover:cursor-pointer`} icon={faStrikethrough}
                                             data-style="STRIKETHROUGH"
                                             onMouseDown={toggleRichTextStyle}
                                         />
-                                    </section>
 
-                                    <section>
-                                        <span className="mr-2">Code</span>
+
                                         <FontAwesomeIcon
-                                            className={`${renderInlineStyle("CODE")} ml-4 hover:cursor-pointer`} icon={faCode}
+                                            className={`${renderInlineStyle("CODE")} hover:cursor-pointer row-start-5`} icon={faCode}
                                             data-style="CODE"
                                             onMouseDown={toggleRichTextStyle}
                                         />
-                                    </section>
 
-                                    <section>
-                                        <span className="mr-5">List</span>
+
                                         <FontAwesomeIcon
-                                            className={`${renderBlockStyle("unordered-list-item")} ml-4 hover:cursor-pointer`} icon={faListUl}
+                                            className={`${renderBlockStyle("unordered-list-item")} hover:cursor-pointer row-start-9`} icon={faListUl}
                                             data-block="unordered-list-item"
                                             onMouseDown={toggleRichTextStyle}
                                         />
                                         <FontAwesomeIcon
-                                            className={`${renderBlockStyle("ordered-list-item")} ml-4 hover:cursor-pointer`} icon={faListNumeric}
+                                            className={`${renderBlockStyle("ordered-list-item")} hover:cursor-pointer row-start-9`} icon={faListNumeric}
                                             data-block="ordered-list-item"
                                             onMouseDown={toggleRichTextStyle}
                                         />
-                                    </section>
 
-                                    <section>
-                                        <span className="mt-2">Others</span>
-                                    </section>
-
-                                    <section className="grid grid-cols-5 gap-4 ml-1 mr-4">
-                                        <FontAwesomeIcon className={`hover:cursor-pointer`} icon={faUndo}
+                                        <FontAwesomeIcon className={`hover:cursor-pointer row-start-13`} icon={faUndo}
                                             onMouseDown={() => setEditorState(EditorState.undo(editorState))}
                                         />
-                                        <FontAwesomeIcon className={`${renderBlockStyle("header-two")} hover:cursor-pointer`} icon={faRedo}
+                                        <FontAwesomeIcon className={`${renderBlockStyle("header-two")} hover:cursor-pointer row-start-13`} icon={faRedo}
                                             onMouseDown={() => setEditorState(EditorState.redo(editorState))}
                                         />
-                                        <FontAwesomeIcon className={`${renderBlockStyle("ALIGN-LEFT")} hover:cursor-pointer`} icon={faAlignLeft}
-                                            data-block="ALIGN-LEFT"
-                                            onMouseDown={toggleRichTextStyle}
-                                        />
-                                        <FontAwesomeIcon className={`${renderBlockStyle("ALIGN-CENTER")} hover:cursor-pointer`} icon={faAlignCenter}
-                                            data-block="ALIGN-CENTER"
-                                            onMouseDown={toggleRichTextStyle}
-                                        />
-                                        <FontAwesomeIcon className={`${renderBlockStyle("ALIGN-RIGHT")} hover:cursor-pointer`} icon={faAlignRight}
-                                            data-block="ALIGN-RIGHT"
-                                            onMouseDown={toggleRichTextStyle}
-                                        />
-                                        <FontAwesomeIcon className={`${renderBlockStyle("ALIGN-JUSTIFY")} hover:cursor-pointer`} icon={faAlignJustify}
-                                            data-block="ALIGN-JUSTIFY"
-                                            onMouseDown={toggleRichTextStyle}
-                                        />
-                                        <FontAwesomeIcon className={`${renderInlineStyle("SUBSCRIPT")} hover:cursor-pointer`} icon={faSubscript}
+                                        <FontAwesomeIcon className={`${renderInlineStyle("SUBSCRIPT")} hover:cursor-pointer row-start-13`} icon={faSubscript}
                                             data-style="SUBSCRIPT"
                                             onMouseDown={toggleRichTextStyle}
                                         />
-                                        <FontAwesomeIcon className={`${renderInlineStyle("SUPERSCRIPT")} hover:cursor-pointer`} icon={faSuperscript}
+                                        <FontAwesomeIcon className={`${renderInlineStyle("SUPERSCRIPT")} hover:cursor-pointer row-start-13`} icon={faSuperscript}
                                             data-style="SUPERSCRIPT"
                                             onMouseDown={toggleRichTextStyle}
                                         />
+
+                                        <div className="row-start-[17] col-span-[1/-2]">{getCharCount()}</div>
+                                        <div className="row-start-[17]">characters</div>
+                                        <div className="row-start-[18] col-span-[1/-2]">{getWordCount()}</div>
+                                        <div className="row-start-[18]">words</div>
+                                        <div className="row-start-[19] col-span-[1/-2]">{getCharCount()}</div>
+                                        <div className="row-start-[19]">characters</div>
                                     </section>
 
                                 </div>
@@ -307,7 +295,7 @@ export default function ChapterEdit() {
                         </div>
                     </>
                 }
-            </div>
-        </div>
+            </div >
+        </div >
     )
 }

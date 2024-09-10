@@ -21,7 +21,6 @@ export default function ChapterView({
     bookTitle,
     chapterNum,
     chapterTitle,
-    chapterContent,
     editorState,
     setEditorState,
     getPrevChapterNum,

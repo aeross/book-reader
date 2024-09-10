@@ -30,3 +30,8 @@ export function checkIfUserIsAnAuthor(authors?: User[] | null, user?: User | nul
     }
     return output;
 }
+
+export function getWordCountFromPlainText(plainText: string) {
+    const words = plainText.trim().split(/\s+/);
+    return words.filter(Boolean).length;
+}
